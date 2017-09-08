@@ -1,0 +1,22 @@
+{
+  "name": "vue-happy-scroll",
+  "version": "1.0.0",
+  "description": "scroll component for vue2.0",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tangdaohai/vue-happy-scroll.git"
+  },
+  "keywords": [
+    "vue",
+    "scroll"
+  ],
+  "author": "tangdaohai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tangdaohai/vue-happy-scroll/issues"
+  },
+  "homepage": "https://github.com/tangdaohai/vue-happy-scroll#readme"
+}
