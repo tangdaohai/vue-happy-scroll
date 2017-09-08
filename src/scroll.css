@@ -1,0 +1,44 @@
+.happy-scroll {
+    overflow: hidden;
+    position: relative;
+}
+.happy-scroll-strip {}
+.happy-scroll-strip--vertical {
+    position: absolute;
+    right: 1px;
+    top:0;
+    height: 100%;
+}
+.happy-scroll-strip--vertical .scrollBar {
+    background-color: rgba(187,187,187,0.4);
+    border-radius: 7px;
+    width: 4px;
+    height:0;
+}
+.happy-scroll-strip--horizontal {
+    position: absolute;
+    bottom: 1px;
+    left:0;
+    width: 100%;
+}
+.happy-scroll-strip--horizontal .scrollBar {
+    background-color: rgba(51,51,51,0.2);
+    border-radius: 7px;
+    height: 4px;
+    width:0;
+}
+.happy-scroll-container {
+    margin-right: -17px;
+    margin-bottom: -15px;
+    overflow: auto;
+}
+.happy-scroll-container > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.happy-scroll-container:hover .happy-scroll-strip {
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.1s linear;
+}
