@@ -5,7 +5,6 @@
 </template>
 <script>
 import { on, off } from './util';
-import './scroll.css';
 export default {
   name: 'happy-scroll-strip',
   props: {

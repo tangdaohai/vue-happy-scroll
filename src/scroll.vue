@@ -4,14 +4,13 @@
       <slot></slot>
     </div>
     <!-- 竖向垂直滚动条 -->
-    <happy-scroll-strip v-model="slideY" :percentage="percentageY" :move="moveY" />
+    <happy-scroll-strip v-model="slideY" :percentage="percentageY" :move="moveY"></happy-scroll-strip>
     <!-- 横向水平滚动条 -->
-    <happy-scroll-strip v-model="slideX" horizontal :percentage="percentageX" :move="moveX" />
+    <happy-scroll-strip v-model="slideX" horizontal :percentage="percentageX" :move="moveX"></happy-scroll-strip>
   </div>
 </template>
 <script>
 import HappyScrollStrip from './strip.vue';
-import './scroll.css';
 export default {
   name: 'happy-scroll',
   props: {
