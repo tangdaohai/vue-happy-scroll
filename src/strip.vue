@@ -74,7 +74,7 @@ export default {
       const container = this.$refs.stripContainer, //滚动条的容器
         strip = this.$refs.strip   //滚动条本身
 
-      if (!this.percentage && !container) {
+if (!this.percentage && !container) {
         return
       }
       //滚动条的高度或宽度 = 滚动条容器(100%高) * 百分比(外层内容与容器的比例)
@@ -89,8 +89,20 @@ export default {
      * 变化滚动条的位置，scroll主体内容，滚动时，滚动条跟着联动
      */
     translate() {
+      let offset = this.move * this.percentage
+
+      if(!this.$refs.stripContainer)  return
+
+      const rect = this.$refs.stripContainer.getBoundingClientRect(),
+            maxOffset = rect[this.config.sizeAttr] - this.length
+      if(offset < 0){
+        offset = 0
+      }
+      if(offset > maxOffset){
+        offset = maxOffset
+      }
       return {
-        transform: `${this.config.translate}(${this.move * this.percentage}px)`
+        transform: `${this.config.translate}(${offset}px)`
       }
     },
     //初始化滚动条位置

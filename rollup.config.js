@@ -1,7 +1,9 @@
 import replace from 'rollup-plugin-replace'
 import vue from 'rollup-plugin-vue'
-import css from 'rollup-plugin-css-only';
-import json from 'rollup-plugin-json';
+import css from 'rollup-plugin-css-only'
+import json from 'rollup-plugin-json'
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
 import uglify from 'rollup-plugin-uglify'
 import { minify } from 'uglify-es'
 
@@ -14,13 +16,15 @@ export default {
   external: ['vue'],
   plugins: [
     replace({
-      'process.env.NODE_ENV': "''"
+      'process.env.NODE_ENV': '"production"'
     }),
+    resolve(),
+    commonjs(),
     vue(),
     css({
       output: './docs/happy-scroll.css'
     }),
     json(),
-    // uglify({}, minify)
+    uglify({}, minify)
   ]
 }

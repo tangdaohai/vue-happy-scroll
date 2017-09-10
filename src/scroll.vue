@@ -1,11 +1,11 @@
 <template>
   <div class="happy-scroll" :style="{ width: width + 'px', height: height + 'px' }">
-    <div class="happy-scroll-container" ref="container" :style="{ width: width + 15 + 'px', height: height + 15 + 'px' }" @scroll.stop="onScroll">
+    <div class="happy-scroll-container" ref="container" :style="[initSize]" @scroll.stop="onScroll">
       <slot></slot>
     </div>
     <!-- 竖向垂直滚动条, 如果 percentageY 比例等于1不显示该滚动条 -->
     <happy-scroll-strip
-      v-if="!hideVertical && percentageY < 1"
+      v-show="!hideVertical && percentageY < 1"
       v-model="slideY"
       v-bind="$attrs"
       :throttle="throttle"
@@ -14,7 +14,7 @@
     </happy-scroll-strip>
     <!-- 横向水平滚动条 -->
     <happy-scroll-strip
-      v-if="!hideHorizontal && percentageX < 1"
+      v-show="!hideHorizontal && percentageX < 1"
       horizontal
       v-model="slideX"
       v-bind="$attrs"
@@ -27,6 +27,8 @@
 <script>
 import { generateThrottle } from './util'
 import HappyScrollStrip from './strip.vue'
+//@FIXME 需要一个更优的解决方案
+import ElementResizeDetectorMaker from "element-resize-detector"
 import './scroll.css'
 export default {
   name: 'happy-scroll',
@@ -60,7 +62,19 @@ export default {
     throttle: {
       type: Number,
       default: 14 //默认14毫秒
-    }
+    },
+    //是否开启监控视图大小发生变化
+    resize: Boolean,
+    //(当resize=true时生效)当视图宽高变小时(内容减少) 滚动条移动到 -> start(竖向时表示最上边，横向时表示最左边)、end、默认保持不变
+    smallerMove: {
+      type: String,
+      default: ''
+    },
+    //(当resize=true时生效)当视图宽高变大时(内容增多)
+    biggerMove: {
+      type: String,
+      default: ''
+    },
   },
   data() {
     return {
@@ -74,6 +88,12 @@ export default {
       slideY: +this.scrollLeft,
       //监听scroll事件的节流函数
       scrollThrottle: generateThrottle()
+    }
+  },
+  computed: {
+    initSize () {
+      // 15 为浏览器自动滚动条的大小
+      return { width: this.width + (15) + 'px', height: this.height + (!this.hideVertical && this.percentageX < 1 ? 15 : 0) + 'px' }
     }
   },
   watch: {
@@ -93,21 +113,87 @@ export default {
   },
   methods: {
     //监听dom元素的滚动事件，通知strip，将bar移动到对应位置
-    onScroll(e) {
+    onScroll (e) {
       //节流
       if(!this.scrollThrottle(Date.now())) return
       this.moveY = this.$refs.container.scrollTop
       this.moveX = this.$refs.container.scrollLeft
+    },
+    //获取滚动条百分比
+    getPercentage () {
+      //竖向滚动条高度与容器高度百分比
+      this.percentageY = (this.$refs.container.clientHeight) / this.$refs.container.scrollHeight
+      //横向滚动条高度与容器高度百分比
+      this.percentageX = this.$refs.container.clientWidth / this.$refs.container.scrollWidth
+    },
+    //slot视图大小变化时的监听
+    resizeListener () {
+      //没开启监听reszie方法
+      if(!this.resize) return
+
+      //监听slot视图元素resize
+      let elementResizeDetector = ElementResizeDetectorMaker({
+        strategy: "scroll",
+        callOnAdd: false
+      });
+
+      //记录视图上次宽高的变化
+      let lastHeight = 0, lastWidth = 0
+
+      elementResizeDetector.listenTo(this.$slots.default[0]['elm'], (element) => {
+        //初始化百分比
+        this.getPercentage()
+
+        //获取竖向滚动条变小或者变大的移动策略
+        let moveTo
+        if(element.clientHeight < lastHeight){
+          moveTo = this.smallerMove.toLocaleLowerCase()
+        }
+        if(element.clientHeight > lastHeight){
+          moveTo = this.biggerMove.toLocaleLowerCase()
+        }
+
+        if(moveTo === 'start'){
+          //竖向滚动条移动到顶部
+          this.slideY = this.moveY = 0
+        }
+        if(moveTo === 'end'){
+          //竖向滚动条移动到底部
+          this.slideY = this.moveY = element.clientHeight
+        }
+
+        lastHeight = element.clientHeight
+
+        //获取横向向滚动条变小或者变大的移动策略
+        moveTo = ''
+        if(element.clientWidth < lastWidth){
+          moveTo = this.smallerMove.toLocaleLowerCase()
+        }
+        if(element.clientWidth > lastWidth){
+          moveTo = this.biggerMove.toLocaleLowerCase()
+        }
+
+        if(moveTo === 'start'){
+          //竖向滚动条移动到顶部
+          this.slideX = this.moveX = 0
+        }
+        if(moveTo === 'end'){
+          //竖向滚动条移动到底部
+          this.slideX = this.moveX = element.clientHeight
+        }
+
+        lastWidth = element.clientWidth
+      });
     }
   },
   components: {
     HappyScrollStrip
   },
   mounted() {
-    //竖向滚动条高度与容器高度百分比
-    this.percentageY = (this.$refs.container.clientHeight) / this.$refs.container.scrollHeight
-    //横向滚动条高度与容器高度百分比
-    this.percentageX = this.$refs.container.clientWidth / this.$refs.container.scrollWidth
+    //初始化百分比
+    this.getPercentage()
+    //监听slot视图变化, 方法内部会判断是否设置了开启监听resize
+    this.resizeListener()
   }
 }
 </script>
