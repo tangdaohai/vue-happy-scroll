@@ -3,43 +3,70 @@
   <head>
     <meta charset="utf-8">
     <title>vue happy scroll</title>
-    <link rel="stylesheet" href="./scroll.css">
+    <link rel="stylesheet" href="./happy-scroll.css">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body, #app{
+        height: 100%;
+        width: 100%;
+      }
+
+      #app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container{
+        background: #f6f6f6;
+        padding: 20px;
+        border: 1px solid #4fc08d;
+      }
+
+      p:nth-child(odd){
+        background-color: #eee
+      }
+    </style>
   </head>
   <body>
     <div id="app">
-      <div>
-        <happy-scroll horizontal>
-          <div>
-            <p>1844444444444444444444444444444444444444444444444444</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-            <p>1</p>
-          </div>
-        </happy-scroll>
+      <div class="container">
+          <happy-scroll class="content" size="6" color="#4fc08d">
+            <div>
+              <p>18444444444444444444444444444444444444</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+              <p>1</p>
+            </div>
+          </happy-scroll>
       </div>
     </div>
     <script src="https://unpkg.com/vue@2.4.2/dist/vue.js"></script>
