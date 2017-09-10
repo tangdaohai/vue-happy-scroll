@@ -1,8 +1,9 @@
 {
   "name": "vue-happy-scroll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "scroll component for vue2.0",
-  "main": "index.js",
+  "main": "./docs/happy-scroll.min.js",
+  "module": "./src/index.js",
   "scripts": {
     "build": "./node_modules/.bin/rollup --config",
     "watch": "./node_modules/.bin/rollup --config --watch"
