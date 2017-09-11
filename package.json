@@ -1,6 +1,6 @@
 {
   "name": "vue-happy-scroll",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "scroll component for vue2.4",
   "main": "./docs/happy-scroll.min.js",
   "module": "./src/index.js",

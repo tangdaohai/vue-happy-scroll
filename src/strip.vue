@@ -72,14 +72,13 @@ export default {
      */
     initStrip() {
       const container = this.$refs.stripContainer, //滚动条的容器
-        strip = this.$refs.strip   //滚动条本身
+            strip = this.$refs.strip   //滚动条本身
 
-if (!this.percentage && !container) {
+      if (!this.percentage && !container) {
         return
       }
       //滚动条的高度或宽度 = 滚动条容器(100%高) * 百分比(外层内容与容器的比例)
-      const number = container[this.config.client] * this.percentage
-      this.length = number
+      const number = this.length = container[this.config.client] * this.percentage
       //根据 水平还是垂直方向 决定初始化滚动条的 宽还是高
       return {
         [this.config.sizeAttr]: `${number}px`

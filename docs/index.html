@@ -19,14 +19,19 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: 18px;
       }
 
       .container{
+        width: 300px;
+        height: 280px;
         background: #f6f6f6;
         padding: 20px;
         border: 1px solid #4fc08d;
       }
-
+      p{
+        width: 500px;
+      }
       p:nth-child(odd){
         background-color: #eee
       }
@@ -35,36 +40,10 @@
   <body>
     <div id="app">
       <div class="container">
-          <happy-scroll class="content" size="6" color="#4fc08d">
+          <happy-scroll class="content" size="6" color="#4fc08d" scroll-top="90">
             <div>
-              <p>18444444444444444444444444444444444444</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
-              <p>1</p>
+              <p>18444444444444444444444444444444444445</p>
+              <p v-for="i in 33">{{i}}</p>
             </div>
           </happy-scroll>
       </div>

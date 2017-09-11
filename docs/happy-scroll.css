@@ -1,4 +1,6 @@
 .happy-scroll {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     position: relative;
 }
@@ -26,6 +28,10 @@
     border-radius: 7px;
     height: 4px;
     width:0;
+}
+/* 在webkit内核下将滚动条隐藏，Firefox下采用容器覆盖的机制 */
+.happy-scroll-container::-webkit-scrollbar  {
+  display: none;
 }
 .happy-scroll-container {
     margin-right: -17px;

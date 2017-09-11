@@ -1,6 +1,7 @@
 <template>
-  <div class="happy-scroll" :style="{ width: width + 'px', height: height + 'px' }">
+  <div class="happy-scroll" ref="happy-scroll">
     <div class="happy-scroll-container" ref="container" :style="[initSize]" @scroll.stop="onScroll">
+      <!-- 视图元素 -->
       <slot></slot>
     </div>
     <!-- 竖向垂直滚动条, 如果 percentageY 比例等于1不显示该滚动条 -->
@@ -34,16 +35,6 @@ export default {
   name: 'happy-scroll',
   inheritAttrs: false,
   props: {
-    //容器宽度
-    width: {
-      type: Number,
-      default: 300
-    },
-    //容器高度
-    height: {
-      type: Number,
-      default: 280
-    },
     //设置竖向滚动条的位置
     scrollTop: {
       type: [Number, String],
@@ -78,6 +69,11 @@ export default {
   },
   data() {
     return {
+      //视图元素的容器的宽高，此处设置为40，是为了获取到浏览器滚动条的大小，在mounted之后会计算该属性
+      initSize: {
+        width: '40px',
+        height: '40px'
+      },
       //横向滚动条百分比
       percentageX: 0,
       moveX: 0, //slot dom元素滚动的位置
@@ -87,13 +83,10 @@ export default {
       moveY: +this.scrollTop,
       slideY: +this.scrollLeft,
       //监听scroll事件的节流函数
-      scrollThrottle: generateThrottle()
-    }
-  },
-  computed: {
-    initSize () {
-      // 15 为浏览器自动滚动条的大小
-      return { width: this.width + (15) + 'px', height: this.height + (!this.hideVertical && this.percentageX < 1 ? 15 : 0) + 'px' }
+      scrollThrottle: generateThrottle(),
+      //浏览器滚动条大小, 默认为15px
+      browserHSize: 15,
+      browserVSize: 15
     }
   },
   watch: {
@@ -104,6 +97,7 @@ export default {
     slideY() {
       this.$refs.container.scrollTop = this.slideY / this.percentageY
     },
+    //监听 滑动到指定位置
     scrollTop () {
       this.moveY = +this.scrollTop
     },
@@ -119,10 +113,17 @@ export default {
       this.moveY = this.$refs.container.scrollTop
       this.moveX = this.$refs.container.scrollLeft
     },
+    //初始化，获取浏览器滚动条的大小
+    initBrowserSize(){
+      //获取当前浏览器滚动条的宽高,如果是0(0的情况可能是还没出现滚动条) 采用默认的大小
+      this.browserHSize = (this.$refs.container.offsetWidth - this.$refs.container.clientWidth)
+      //横向滚动的高度
+      this.browserVSize = (this.$refs.container.offsetHeight - this.$refs.container.clientHeight)
+    },
     //获取滚动条百分比
     getPercentage () {
       //竖向滚动条高度与容器高度百分比
-      this.percentageY = (this.$refs.container.clientHeight) / this.$refs.container.scrollHeight
+      this.percentageY = this.$refs.container.clientHeight / this.$refs.container.scrollHeight
       //横向滚动条高度与容器高度百分比
       this.percentageX = this.$refs.container.clientWidth / this.$refs.container.scrollWidth
     },
@@ -143,7 +144,7 @@ export default {
       elementResizeDetector.listenTo(this.$slots.default[0]['elm'], (element) => {
         //初始化百分比
         this.getPercentage()
-
+        this.initBrowserSize()
         //获取竖向滚动条变小或者变大的移动策略
         let moveTo
         if(element.clientHeight < lastHeight){
@@ -190,10 +191,21 @@ export default {
     HappyScrollStrip
   },
   mounted() {
-    //初始化百分比
-    this.getPercentage()
+    //获取当前浏览器滚动条的宽高,如果是0(0的情况可能是还没出现滚动条) 采用默认的大小
+    this.initBrowserSize()
     //监听slot视图变化, 方法内部会判断是否设置了开启监听resize
     this.resizeListener()
+
+    //根据最外层div，初始化内部容器的宽高，包含滚动条的宽高
+    this.initSize = {
+      width: this.$refs['happy-scroll'].clientWidth + (!this.hideHorizontal && this.percentageY < 1 ? this.browserHSize : 0) + 'px',
+      height: this.$refs['happy-scroll'].clientHeight + (!this.hideVertical && this.percentageX < 1 ? this.browserVSize : 0) + 'px'
+    }
+
+    this.$nextTick(() => {
+      //渲染完毕之后再计算滚动条的比例
+      this.getPercentage()
+    })
   }
 }
 </script>
