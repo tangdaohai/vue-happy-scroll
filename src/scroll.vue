@@ -74,16 +74,16 @@ export default {
         width: '40px',
         height: '40px'
       },
-      //横向滚动条百分比
-      percentageX: 0,
-      moveX: 0, //slot dom元素滚动的位置
-      slideX: 0, //鼠标拖动滚动条的位置
-      //竖向滚动条百分比
-      percentageY: 0,
+
+      percentageX: 0,          //横向滚动条百分比
+      moveX: +this.scrollLeft, //slot dom元素滚动的位置
+      slideX: 0,               //鼠标拖动滚动条的位置
+
+      percentageY: 0,          //竖向滚动条百分比
       moveY: +this.scrollTop,
-      slideY: +this.scrollLeft,
+      slideY: 0,
       //监听scroll事件的节流函数
-      scrollThrottle: generateThrottle(),
+      scrollThrottle: generateThrottle(this.throttle),
       //浏览器滚动条大小, 默认为15px
       browserHSize: 15,
       browserVSize: 15
@@ -99,10 +99,10 @@ export default {
     },
     //监听 滑动到指定位置
     scrollTop () {
-      this.moveY = +this.scrollTop
+      this.$refs.container.scrollTop = this.moveY = +this.scrollTop
     },
     scrollLeft () {
-      this.moveX = +this.scrollLeft
+      this.$refs.container.scrollLeft = this.moveX = +this.scrollLeft
     }
   },
   methods: {
@@ -185,6 +185,18 @@ export default {
 
         lastWidth = element.clientWidth
       });
+    },
+    setContainerSize () {
+      //根据最外层div，初始化内部容器的宽高，包含滚动条的宽高
+      this.initSize = {
+        width: this.$refs['happy-scroll'].clientWidth + (!this.hideHorizontal && this.percentageY < 1 ? this.browserHSize : 0) + 'px',
+        height: this.$refs['happy-scroll'].clientHeight + (!this.hideVertical && this.percentageX < 1 ? this.browserVSize : 0) + 'px'
+      }
+
+      this.$nextTick(() => {
+        //渲染完毕之后再计算滚动条的比例
+        this.getPercentage()
+      })
     }
   },
   components: {
@@ -196,16 +208,15 @@ export default {
     //监听slot视图变化, 方法内部会判断是否设置了开启监听resize
     this.resizeListener()
 
-    //根据最外层div，初始化内部容器的宽高，包含滚动条的宽高
-    this.initSize = {
-      width: this.$refs['happy-scroll'].clientWidth + (!this.hideHorizontal && this.percentageY < 1 ? this.browserHSize : 0) + 'px',
-      height: this.$refs['happy-scroll'].clientHeight + (!this.hideVertical && this.percentageX < 1 ? this.browserVSize : 0) + 'px'
-    }
+    this.setContainerSize()
 
-    this.$nextTick(() => {
-      //渲染完毕之后再计算滚动条的比例
-      this.getPercentage()
-    })
+    //监听滚动条宽度变化，有滚动条 -> 无滚动条, 在mounted中监听是为了确保$refs可调用
+    this.$watch('browserHSize', this.setContainerSize)
+    this.$watch('browserVSize', this.setContainerSize)
+
+    //将视图dom移动到设定的位置
+    +this.scrollTop & (this.$refs.container.scrollTop = +this.scrollTop)
+    +this.scrollLeft & (this.$refs.container.scrollLeft = +this.scrollLeft)
   }
 }
 </script>

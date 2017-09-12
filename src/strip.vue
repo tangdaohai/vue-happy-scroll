@@ -6,7 +6,7 @@
        @wheel.capture.stop="handlerWheel">
 
     <div ref="strip"
-      class="scrollBar"
+      class="happy-scroll-bar"
       :style="[translate, initStrip, initSize, {background: color}]"
       @mousedown.stop="handlerMouseDown">
     </div>

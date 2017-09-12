@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>vue happy scroll</title>
     <link rel="stylesheet" href="./happy-scroll.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
     <style>
       * {
         margin: 0;
@@ -20,6 +21,11 @@
         justify-content: center;
         align-items: center;
         font-size: 18px;
+        flex-direction: column;
+      }
+
+      .buttons{
+        margin-bottom: 10px;
       }
 
       .container{
@@ -30,7 +36,7 @@
         border: 1px solid #4fc08d;
       }
       p{
-        width: 500px;
+        /* width: 500px; */
       }
       p:nth-child(odd){
         background-color: #eee
@@ -39,20 +45,43 @@
   </head>
   <body>
     <div id="app">
+      <div class="buttons">
+        <el-button @click="length++">增加1条</el-button>
+        <el-button @click="length--">减少1条</el-button>
+        <el-button @click="scrollTop+=10">向下滚动10px</el-button>
+        <el-button @click="scrollTop > 0 && (scrollTop-=10)">向上滚动10px</el-button>
+      </div>
       <div class="container">
-          <happy-scroll class="content" size="6" color="#4fc08d" scroll-top="90">
+          <happy-scroll class="content" size="6" left :scroll-left="scrollLeft" :scroll-top="scrollTop" color="#4fc08d" resize>
             <div>
-              <p>18444444444444444444444444444444444445</p>
-              <p v-for="i in 33">{{i}}</p>
+              <p>18444444888888899999977777766666665555555</p>
+              <p v-for="i in length">{{i}}</p>
             </div>
           </happy-scroll>
       </div>
+
+      <!-- <div class="container">
+          <happy-scroll class="content" size="3" color="#4fc08d" scroll-top="90" resize>
+            <div>
+              <p>18444444</p>
+              <p v-for="i in 40">{{i}}</p>
+            </div>
+          </happy-scroll>
+      </div> -->
     </div>
     <script src="https://unpkg.com/vue@2.4.2/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="./happy-scroll.min.js"></script>
     <script>
       new Vue({
-        el: '#app'
+        el: '#app',
+        data () {
+          return {
+            length: 20,
+            scrollTop: 0,
+            scrollLeft: 0
+          }
+        }
       })
     </script>
   </body>
