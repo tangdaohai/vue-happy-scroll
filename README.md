@@ -1,7 +1,11 @@
 vue happy scroll
 ===
 
-### 安装
+> 基于vue2的一款滚动条插件。
+
+
+
+## 安装
 
 1. npm
   推荐使用`npm`，这样可以跟随你的`webpack`配置去选择怎样打包。
@@ -50,7 +54,7 @@ vue happy scroll
 
    > 可以访问[https://unpkg.com/vue-happy-scroll/](https://unpkg.com/vue-happy-scroll) 来选择不同版本
 
-### 快速使用
+## 注册组件
 
 1. 全局注册
 
@@ -107,4 +111,178 @@ vue happy scroll
    </html>
    ```
 
-   ​
+## 属性
+
+### color
+
+* 类型`String`
+
+* 默认值`rgba(51,51,51,0.2)`
+
+* 用法:
+
+  ```html
+  <happy-scroll color="rgba(51,51,51,0.2)">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  设置滚动条的颜色
+
+  > 建议使用`rgba`，这样可以为滚动条设置透明度，当然，如果你需要设置透明度的话。
+
+### scroll-top
+
+* 类型`Number|String`
+
+* 默认值`0`
+
+* 用法:
+
+  ```html
+  <happy-scroll scroll-top="20">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  在组件`mounted`之后，设置`容器`距离顶部的距离。
+
+  > 相当于`element.scrollTop` 一致。
+
+  `scroll-top`的值会自动转换为数字，所以当值为固定的数字时(使用`+`转换的)，你无需增加`:(v-bind)`，直接写为`scroll-top="20"`即可。
+
+### scroll-left
+
+* 类型`Number|String`
+
+* 默认值`0`
+
+* 用法:
+
+  ```html
+  <happy-scroll scroll-left="20">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  在组件`mounted`之后，设置`容器`距离顶部的距离。
+
+  > 相当于`element.scrollLeft` 一致。
+
+### hide-vertical
+
+* 类型 `Boolean`
+
+* 默认值 `false`
+
+* 用法:
+
+  ```html
+  <!-- 表示隐藏竖向滚动条 -->
+  <happy-scroll hide-vertical>
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  隐藏`竖向`滚动条
+
+### hide-horizontal
+
+- 类型 `Boolean`
+
+- 默认值 `false`
+
+- 用法:
+
+  ```html
+  <!-- 表示隐藏横向滚动条 -->
+  <happy-scroll hide-horizontal>
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  隐藏`横向`滚动条
+
+### resize
+
+* 类型`Boolean`
+
+* 默认值`false`
+
+* 用法:
+
+  ```html
+  <!-- 表示开启监听容器大小变化 -->
+  <happy-scroll resize>
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  如果`你的容器`大小是变化的(`高度`或者`宽度`可能随时发生变化的情况)，可使用`resize`来开启对容器大小变化的监听，当`容器`的`宽高`大于你设定的`宽高`时，会自动出现滚动条，反正会自动隐藏滚动条。
+
+  > 此功能当前版本依赖 [element-resize-detector](https://github.com/wnr/element-resize-detector)，目前正在寻找性能更高的办法，当然此插件的性能还是可以肯定的
+
+### smaller-move
+
+* 类型`String`
+
+* 默认值`''`
+
+* 可选值:
+
+  1. `start`
+  2. `end`
+  3. 除`1、2`的值之外，其他所有值都认为是`默认值`
+
+* 用法:
+
+  ```html
+  <happy-scroll smaller-move="start">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  > 当`resize=true`时，此配置才有效。
+
+  该属性表示当容器`变小`时，滚动条移动的方向。
+
+  当设置为`start`时，表示变小之后，滚动条会移动到`头部`(对`竖向`滚动条来说是`最上边`，对`横向`滚动条来说是`最左边`)
+
+
+### bigger-move
+
+* 类型`String`
+
+* 默认值`''`
+
+* 可选值:
+
+  1. `start`
+  2. `end`
+  3. 除`1、2`的值之外，其他所有值都认为是`默认值`
+
+* 用法:
+
+  ```html
+  <happy-scroll bigger-move="start">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  > 当`resize=true`时，此配置才有效。
+
+  该属性表示当容器大小`变大`时，滚动条移动的方向。
+
+  当设置为`start`时，表示变小之后，滚动条会移动到`头部`(对`竖向`滚动条来说是`最上边`，对`横向`滚动条来说是`最左边`)
+
+### throttle
+
+* 类型`Number`
+
+* 默认值`14` 
+
+* 单位`毫秒`
+
+* 说明:
+
+  设置鼠标拖动滚动条的节流时间，如果没有特殊的要求不建议修改此值。
