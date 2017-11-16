@@ -16,7 +16,7 @@ vue happy scroll
 
   由于当前版本的module模块使用的ES6语法，所以在使用时还需在webpack中增加配置(`resolve('node_modules/vue-happy-scroll')`)
 
-  ```javascript
+  ```
   module: {
     rule: {
       //...
@@ -28,6 +28,8 @@ vue happy scroll
     }
   }
   ```
+
+  ​
 
   ​
 
@@ -165,7 +167,7 @@ vue happy scroll
   </happy-scroll>
   ```
 
-  在组件`mounted`之后，设置`容器`距离顶部的距离。
+  在组件`mounted`之后，设置`容器`距离左边的距离。
 
   > 相当于`element.scrollLeft` 一致。
 
@@ -248,6 +250,10 @@ vue happy scroll
 
   当设置为`start`时，表示变小之后，滚动条会移动到`头部`(对`竖向`滚动条来说是`最上边`，对`横向`滚动条来说是`最左边`)
 
+  当设置为`end`时，表示变小之后，滚动条会移动到`尾部`(对`竖向`滚动条来说是`最下边`，对`横向`滚动条来说是`最右边`)
+
+  当设置为`''`(默认值)时，表示在变小时，滚动条的位置不发生变化。
+
 
 ### bigger-move
 
@@ -273,7 +279,7 @@ vue happy scroll
 
   该属性表示当容器大小`变大`时，滚动条移动的方向。
 
-  当设置为`start`时，表示变小之后，滚动条会移动到`头部`(对`竖向`滚动条来说是`最上边`，对`横向`滚动条来说是`最左边`)
+  属性值与`smaller-move`原理一致。
 
 ### throttle
 
