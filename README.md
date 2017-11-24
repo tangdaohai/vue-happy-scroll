@@ -3,6 +3,9 @@ vue happy scroll
 
 > 基于vue2的一款滚动条插件。
 
+## demo
+
+https://happy-js.github.io/vue-happy-scroll/
 
 
 ## 安装
