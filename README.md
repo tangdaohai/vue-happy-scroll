@@ -1,8 +1,6 @@
 vue happy scroll
 ===
 
-> 基于vue2的一款滚动条插件。当前版本不保证移动端可用。
-
 
 <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/dm/vue-happy-scroll.svg" alt="Downloads"></a>
   <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/v/vue-happy-scroll.svg" alt="Version"></a>
@@ -13,10 +11,16 @@ vue happy scroll
 | :----: | :-----: | :----: | :--: | :----------------------------: |
 |   √    |    √    |   √    |  √   | `9`  √<br />`10` √<br />`11` √ |
 
-## demo
+## Demo 地址
 
 https://happy-js.github.io/vue-happy-scroll/
 
+## vue-happy-scroll 是干嘛的
+
+`vue-happy-scroll`是一款基于vue2.0的滚动条插件。
+此插件致力**解决原生滚动条在不同系统、不同浏览器中的丑陋表现**，在保证原生滚动条功能可用的基础上实现了更丰富的功能、保证在所支持的浏览器下展现出风格一致、交互体验一致的滚动条。
+它可以让你无需关心滚动条的兼容性问题，无需关心`内容区域`的宽高，当设定`resize`属性后，可以根据内容大小`自动显示或隐藏滚动条`。
+这里有对各种丰富的[额外功能](https://github.com/happy-js/vue-happy-scroll#属性)进行说明。
 
 ## 安装
 
@@ -261,6 +265,9 @@ https://happy-js.github.io/vue-happy-scroll/
 
   该属性表示当容器`变小`时，滚动条移动的方向。
 
+  * smaller-move-h 内容变小时，`横向`滚动条移动的方向
+  * smaller-move-v 内容变小时，`竖向`滚动条移动的方向
+
   当设置为`start`时，表示变小之后，滚动条会移动到`头部`(对`竖向`滚动条来说是`最上边`，对`横向`滚动条来说是`最左边`)
 
   当设置为`end`时，表示变小之后，滚动条会移动到`尾部`(对`竖向`滚动条来说是`最下边`，对`横向`滚动条来说是`最右边`)
@@ -308,7 +315,7 @@ https://happy-js.github.io/vue-happy-scroll/
 
 ## PR
 期待并欢迎您的PR。
-但请您一定要遵守`[standard](https://github.com/standard/standard)`代码风格规范。
+但请您一定要遵守[standard](https://github.com/standard/standard)代码风格规范。
 并且您只需要提交`src`目录下的源码即可，`无需`提交`build`之后的代码
 
 ## MIT
