@@ -6,11 +6,11 @@
  * @param {any} eventType
  * @param {any} callback
  */
-export function on(dom, eventType, callback){
-  if(document.addEventListener){
-      dom.addEventListener(eventType, callback);
-  }else{
-      dom.attachEvent('on' + eventType, callback);
+export function on (dom, eventType, callback) {
+  if (document.addEventListener) {
+    dom.addEventListener(eventType, callback)
+  } else {
+    dom.attachEvent('on' + eventType, callback)
   }
 }
 
@@ -22,11 +22,11 @@ export function on(dom, eventType, callback){
 * @param {any} eventType
 * @param {any} callback
 */
-export function off(dom, eventType, callback){
-  if(document.addEventListener){
-      dom.removeEventListener(eventType, callback);
-  }else{
-      dom.detachEvent('on' + eventType, callback);
+export function off (dom, eventType, callback) {
+  if (document.addEventListener) {
+    dom.removeEventListener(eventType, callback)
+  } else {
+    dom.detachEvent('on' + eventType, callback)
   }
 }
 
@@ -41,12 +41,12 @@ export function off(dom, eventType, callback){
  * @param throttleTime 设置此生成器的阈值
  */
 export const generateThrottle = function (throttleTime) {
-  let time = Date.now();
+  let time = Date.now()
   return function (now) {
-    //如果没有设置节流时间， 使用默认配置的时间 14毫秒
+    // 如果没有设置节流时间， 使用默认配置的时间 14毫秒
     if (now - time > (throttleTime || 14)) {
-      time = now;
-      return true;
+      time = now
+      return true
     }
   }
 }

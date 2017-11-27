@@ -2,9 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>vue happy scroll</title>
+    <title>vue-happy-scroll</title>
     <link rel="stylesheet" href="./happy-scroll.css">
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/element-ui"></script>
+    <script src="./happy-scroll.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -34,52 +37,85 @@
         background: #f6f6f6;
         padding: 20px;
         border: 1px solid #4fc08d;
+        white-space: nowrap;
       }
       p{
-        /* width: 500px; */
+        font-size: 14px;
+        margin: 5px;
       }
       p:nth-child(odd){
         background-color: #eee
+      }
+
+      .footer {
+        margin-top: 20px;
       }
     </style>
   </head>
   <body>
     <div id="app">
       <div class="buttons">
-        <el-button @click="length++">增加1条</el-button>
-        <el-button @click="length--">减少1条</el-button>
+        <el-button @click="length < 28 && length++">增加1条</el-button>
+        <el-button @click="length > 0 && length--">减少1条</el-button>
         <el-button @click="scrollTop+=10">向下滚动10px</el-button>
         <el-button @click="scrollTop > 0 && (scrollTop-=10)">向上滚动10px</el-button>
+        <a href="https://github.com/happy-js/vue-happy-scroll" target="_black"><el-button type="success">GitHub</el-button></a>
       </div>
       <div class="container">
-          <happy-scroll class="content" size="6" left :scroll-left="scrollLeft" :scroll-top="scrollTop" color="#4fc08d" resize>
+          <happy-scroll class="content"
+            size="6"
+            left
+            :scroll-left.sync="scrollLeft"
+            :scroll-top.sync="scrollTop"
+            bigger-move-h="end"
+            smaller-move-h="end"
+            color="rgba(79, 192, 141, .7)"
+            resize>
             <div>
-              <p>18444444888888899999977777766666665555555</p>
-              <p v-for="i in length">{{i}}</p>
+              <p>回答 - 北岛。诗中展现了悲愤之极的冷峻，以坚定的口吻表达了对暴力世界的怀疑。</p>
+              <p v-for="(item, index) in text" v-if="index < length">{{item}}</p>
             </div>
           </happy-scroll>
       </div>
-
-      <!-- <div class="container">
-          <happy-scroll class="content" size="3" color="#4fc08d" scroll-top="90" resize>
-            <div>
-              <p>18444444</p>
-              <p v-for="i in 40">{{i}}</p>
-            </div>
-          </happy-scroll>
-      </div> -->
     </div>
-    <script src="https://unpkg.com/vue@2.4.2/dist/vue.js"></script>
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <script src="./happy-scroll.min.js"></script>
     <script>
       new Vue({
         el: '#app',
-        data () {
+        data: function () {
           return {
-            length: 20,
+            length: 12,
             scrollTop: 0,
-            scrollLeft: 0
+            scrollLeft: 0,
+            text: [
+              '卑鄙是卑鄙者的通行证，',
+              '高尚是高尚者的墓志铭。',
+              '看吧，在那镀金的天空中，',
+              '飘满了死者弯曲的倒影。',
+              '冰川纪过去了，',
+              '为什么到处都是冰凌？',
+              '好望角发现了，',
+              '为什么死海里千帆相竞？',
+              '我来到这个世界上，',
+              '只带着纸、绳索和身影，',
+              '为了在审判之前，',
+              '宣读那些被判决了的声音：',
+              '告诉你吧，世界，',
+              '我——不——相——信！',
+              '纵使你脚下有一千名挑战者，',
+              '那就把我算做第一千零一名。',
+              '我不相信天是蓝的，',
+              '我不相信雷的回声；',
+              '我不相信梦是假的，',
+              '我不相信死无报应。',
+              '如果海洋注定要决堤，',
+              '就让所有的苦水都注入我心中；',
+              '如果陆地注定要上升，',
+              '就让人类重新选择生存的峰顶。',
+              '新的转机和闪闪的星斗，',
+              '正在缀满没有遮拦的天空，',
+              '那是五千年的象形文字，',
+              '那是未来人们凝视的眼睛。'
+            ]
           }
         }
       })

@@ -16,6 +16,7 @@
     border-radius: 7px;
     width: 6px;
     height: 0;
+    -webkit-transition: width 0.4s ease, height 0.6s ease;
     transition: width 0.4s ease, height 0.6s ease;
 }
 .happy-scroll-strip--horizontal {
@@ -29,6 +30,7 @@
     border-radius: 7px;
     height: 6px;
     width: 0;
+    -webkit-transition: height 0.4s ease, width 0.6s ease;
     transition: height 0.4s ease, width 0.6s ease;
 }
 /* 在webkit内核下将滚动条隐藏，Firefox下采用容器覆盖的机制 */
@@ -37,4 +39,8 @@
 }
 .happy-scroll-container {
     overflow: auto;
+}
+
+.happy-scroll-content {
+  display: inline-block;
 }

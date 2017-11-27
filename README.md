@@ -1,7 +1,17 @@
 vue happy scroll
 ===
 
-> 基于vue2的一款滚动条插件。
+> 基于vue2的一款滚动条插件。当前版本不保证移动端可用。
+
+
+<a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/dm/vue-happy-scroll.svg" alt="Downloads"></a>
+  <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/v/vue-happy-scroll.svg" alt="Version"></a>
+<a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/l/vue-happy-scroll.svg" alt="License"></a>
+![欢迎PR](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
+| Chrome | Firefox | Safari | Edge |               IE               |
+| :----: | :-----: | :----: | :--: | :----------------------------: |
+|   √    |    √    |   √    |  √   | `9`  √<br />`10` √<br />`11` √ |
 
 ## demo
 
@@ -227,7 +237,7 @@ https://happy-js.github.io/vue-happy-scroll/
 
   > 此功能当前版本依赖 [element-resize-detector](https://github.com/wnr/element-resize-detector)，目前正在寻找性能更高的办法，当然此插件的性能还是可以肯定的
 
-### smaller-move
+### smaller-move-h、smaller-move-v
 
 * 类型`String`
 
@@ -242,7 +252,7 @@ https://happy-js.github.io/vue-happy-scroll/
 * 用法:
 
   ```html
-  <happy-scroll smaller-move="start">
+  <happy-scroll smaller-move-v="start">
     <!-- 你的内容 -->
   </happy-scroll>
   ```
@@ -258,7 +268,7 @@ https://happy-js.github.io/vue-happy-scroll/
   当设置为`''`(默认值)时，表示在变小时，滚动条的位置不发生变化。
 
 
-### bigger-move
+### bigger-move-h、bigger-move-v
 
 * 类型`String`
 
@@ -273,7 +283,7 @@ https://happy-js.github.io/vue-happy-scroll/
 * 用法:
 
   ```html
-  <happy-scroll bigger-move="start">
+  <happy-scroll bigger-move-h="start">
     <!-- 你的内容 -->
   </happy-scroll>
   ```
@@ -282,16 +292,27 @@ https://happy-js.github.io/vue-happy-scroll/
 
   该属性表示当容器大小`变大`时，滚动条移动的方向。
 
-  属性值与`smaller-move`原理一致。
+  属性值与`smaller-move-h`原理一致。
 
 ### throttle
 
 * 类型`Number`
 
-* 默认值`14` 
+* 默认值`14`
 
 * 单位`毫秒`
 
 * 说明:
 
   设置鼠标拖动滚动条的节流时间，如果没有特殊的要求不建议修改此值。
+
+## PR
+期待并欢迎您的PR。
+但请您一定要遵守`[standard](https://github.com/standard/standard)`代码风格规范。
+并且您只需要提交`src`目录下的源码即可，`无需`提交`build`之后的代码
+
+## MIT
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2017-present, 唐道海

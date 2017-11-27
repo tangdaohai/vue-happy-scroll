@@ -1,11 +1,11 @@
 {
   "name": "vue-happy-scroll",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "description": "scroll component for vue2.4",
   "main": "./docs/happy-scroll.min.js",
-  "module": "./src/index.js",
   "scripts": {
     "build": "./node_modules/.bin/rollup --config",
+    "min": "cross-env NODE_ENV=production ./node_modules/.bin/rollup --config",
     "watch": "./node_modules/.bin/rollup --config --watch"
   },
   "repository": {
@@ -17,10 +17,7 @@
     "scroll",
     "happy scroll"
   ],
-  "author": {
-    "name": "tangdaohai",
-    "email": "tangdaohai@outlook.com"
-  },
+  "author": "tangdaohai@outlook.com",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/happy-js/vue-happy-scroll/issues"
@@ -28,17 +25,37 @@
   "homepage": "https://github.com/happy-js/vue-happy-scroll#readme",
   "dependencies": {
     "element-resize-detector": "^1.1.12",
-    "vue": "^2.4.2"
+    "vue": "^2.0.0"
   },
   "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-preset-env": "^1.6.1",
+    "cross-env": "^5.1.1",
+    "eslint": "^4.7.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-html": "^4.0.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "rollup": "^0.49.3",
+    "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.1",
     "rollup-plugin-css-only": "^0.2.0",
+    "rollup-plugin-eslint": "^4.0.0",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "rollup-plugin-vue": "^2.4.1",
+    "standard": "^10.0.3",
     "uglify-es": "^3.0.28"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }

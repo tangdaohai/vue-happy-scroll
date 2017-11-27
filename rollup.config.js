@@ -1,30 +1,44 @@
 import replace from 'rollup-plugin-replace'
+import babel from 'rollup-plugin-babel'
 import vue from 'rollup-plugin-vue'
 import css from 'rollup-plugin-css-only'
 import json from 'rollup-plugin-json'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
+import eslint from 'rollup-plugin-eslint'
 import uglify from 'rollup-plugin-uglify'
 import { minify } from 'uglify-es'
+import { name, author, homepage, version } from './package.json'
 
+const prod = process.env.NODE_ENV === 'production'
 export default {
   entry: 'src/index.js',
-  dest: './docs/happy-scroll.min.js',
+  dest: `./docs/happy-scroll${prod ? '.min' : ''}.js`,
   format: 'umd',
   moduleName: 'happy-scroll',
   sourceMap: true,
   external: ['vue'],
+  banner: `/*!
+    name: ${name}
+    version: ${version}
+    author: ${author}
+    github: ${homepage}
+  */`,
   plugins: [
     replace({
       'process.env.NODE_ENV': '"production"'
     }),
     resolve(),
-    commonjs(),
-    vue(),
+    json(),
     css({
       output: './docs/happy-scroll.css'
     }),
-    json(),
-    uglify({}, minify)
+    eslint(),
+    commonjs(),
+    vue(),
+    babel({
+      exclude: 'node_modules/**'
+    }),
+    prod ? uglify({}, minify) : ''
   ]
 }
