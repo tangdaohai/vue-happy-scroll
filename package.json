@@ -5,7 +5,8 @@
   "main": "./docs/happy-scroll.min.js",
   "scripts": {
     "build": "./node_modules/.bin/rollup --config",
-    "min": "cross-env NODE_ENV=production ./node_modules/.bin/rollup --config",
+    "min": "cross-env compile_type=min ./node_modules/.bin/rollup --config",
+    "release": "npm run build && npm run min",
     "watch": "./node_modules/.bin/rollup --config --watch"
   },
   "repository": {

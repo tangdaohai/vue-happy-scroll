@@ -33,12 +33,16 @@
   </div>
 </template>
 <script>
-import Vue from 'vue'
-import { generateThrottle } from './util'
+import Vue$ from 'vue'
+import { generateThrottle, debounce } from './util'
 import HappyScrollStrip from './strip.vue'
 // @FIXME 需要一个更优的解决方案
 import ElementResizeDetectorMaker from 'element-resize-detector'
 import './scroll.css'
+let Vue = Vue$
+if (typeof window !== 'undefined' && window.Vue) {
+  Vue = window.Vue
+}
 export default {
   name: 'happy-scroll',
   inheritAttrs: false,
@@ -111,12 +115,13 @@ export default {
   watch: {
     // 鼠标拖动滚动条时，移动slot元素到对应位置
     slideX (newVal) {
-      const left = this.$refs.container.scrollLeft = newVal / this.percentageX
-      this.$emit('update:scrollLeft', left)
+      this.$refs.container.scrollLeft = newVal / this.percentageX
+      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
     },
     slideY (newVal) {
-      const top = this.$refs.container.scrollTop = newVal / this.percentageY
-      this.$emit('update:scrollTop', top)
+      this.$refs.container.scrollTop = newVal / this.percentageY
+      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
+      this.$emit('update:scrollTop', this.$refs.container.scrollTop)
     },
     // 监听（鼠标滑轮或者触摸板滑动） 滑动到指定位置
     scrollTop (newVal) {
@@ -140,14 +145,17 @@ export default {
     }
   },
   methods: {
+    updateSyncScroll: debounce(function () {
+      this.$emit('update:scrollTop', this.moveY)
+      this.$emit('update:scrollLeft', this.moveX)
+    }, 200),
     // 监听dom元素的滚动事件，通知strip，将bar移动到对应位置
     onScroll (e) {
       // 节流
-      if (!this.scrollThrottle(Date.now())) return
-      this.moveY = this.$refs.container.scrollTop
-      this.$emit('update:scrollTop', this.moveY)
-      this.moveX = this.$refs.container.scrollLeft
-      this.$emit('update:scrollLeft', this.moveX)
+      if (!this.scrollThrottle(Date.now())) return false
+      this.moveY = e.target.scrollTop
+      this.moveX = e.target.scrollLeft
+      this.updateSyncScroll()
     },
     // 初始化，获取浏览器滚动条的大小
     initBrowserSize () {
@@ -228,7 +236,7 @@ export default {
         }
         if (moveTo === 'end') {
           // 竖向滚动条移动到底部
-          this.slideX = this.moveX = element.clientHeight
+          this.slideX = this.moveX = element.clientWidth
         }
 
         lastWidth = element.clientWidth

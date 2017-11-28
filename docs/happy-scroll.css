@@ -40,7 +40,3 @@
 .happy-scroll-container {
     overflow: auto;
 }
-
-.happy-scroll-content {
-  display: inline-block;
-}

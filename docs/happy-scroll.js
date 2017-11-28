@@ -7,10 +7,10 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'vue'], factory) :
-	(factory((global['happy-scroll'] = {}),global.Vue$1));
-}(this, (function (exports,Vue$1) { 'use strict';
+	(factory((global['happy-scroll'] = {}),global.Vue$));
+}(this, (function (exports,Vue$) { 'use strict';
 
-Vue$1 = Vue$1 && Vue$1.hasOwnProperty('default') ? Vue$1['default'] : Vue$1;
+Vue$ = Vue$ && Vue$.hasOwnProperty('default') ? Vue$['default'] : Vue$;
 
 /**
  * 绑定事件
@@ -62,6 +62,47 @@ var generateThrottle = function generateThrottle(throttleTime) {
       time = now;
       return true;
     }
+  };
+};
+
+/**
+ * 防反跳。func函数在最后一次调用时刻的wait毫秒之后执行！
+ * @param func 执行函数
+ * @param wait 时间间隔
+ * @param immediate 为true，debounce会在wai 时间间隔的开始调用这个函数
+ * @returns {Function}
+ */
+var debounce = function debounce(func, wait, immediate) {
+  var timeout, args, context, timestamp, result;
+
+  var later = function later() {
+    var last = new Date().getTime() - timestamp; // timestamp会实时更新
+
+    if (last < wait && last >= 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      if (!immediate) {
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      }
+    }
+  };
+
+  return function () {
+    context = this;
+    args = arguments;
+    timestamp = new Date().getTime();
+    var callNow = immediate && !timeout;
+
+    if (!timeout) {
+      timeout = setTimeout(later, wait);
+    }
+    if (callNow) {
+      result = func.apply(context, args);
+      context = args = null;
+    }
+    return result;
   };
 };
 
@@ -1944,6 +1985,10 @@ function getOption(options, name, defaultValue) {
 }
 
 // @FIXME 需要一个更优的解决方案
+var Vue$1 = Vue$;
+if (typeof window !== 'undefined' && window.Vue) {
+  Vue$1 = window.Vue;
+}
 var HappyScroll = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "happy-scroll", staticClass: "happy-scroll" }, [_c('div', { ref: "container", staticClass: "happy-scroll-container", style: [_vm.initSize], on: { "scroll": function scroll($event) {
           $event.stopPropagation();_vm.onScroll($event);
@@ -2024,12 +2069,13 @@ var HappyScroll = { render: function render() {
   watch: {
     // 鼠标拖动滚动条时，移动slot元素到对应位置
     slideX: function slideX(newVal) {
-      var left = this.$refs.container.scrollLeft = newVal / this.percentageX;
-      this.$emit('update:scrollLeft', left);
+      this.$refs.container.scrollLeft = newVal / this.percentageX;
+      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft);
     },
     slideY: function slideY(newVal) {
-      var top = this.$refs.container.scrollTop = newVal / this.percentageY;
-      this.$emit('update:scrollTop', top);
+      this.$refs.container.scrollTop = newVal / this.percentageY;
+      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
+      this.$emit('update:scrollTop', this.$refs.container.scrollTop);
     },
 
     // 监听（鼠标滑轮或者触摸板滑动） 滑动到指定位置
@@ -2054,14 +2100,17 @@ var HappyScroll = { render: function render() {
     }
   },
   methods: {
+    updateSyncScroll: debounce(function () {
+      this.$emit('update:scrollTop', this.moveY);
+      this.$emit('update:scrollLeft', this.moveX);
+    }, 200),
     // 监听dom元素的滚动事件，通知strip，将bar移动到对应位置
     onScroll: function onScroll(e) {
       // 节流
-      if (!this.scrollThrottle(Date.now())) return;
-      this.moveY = this.$refs.container.scrollTop;
-      this.$emit('update:scrollTop', this.moveY);
-      this.moveX = this.$refs.container.scrollLeft;
-      this.$emit('update:scrollLeft', this.moveX);
+      if (!this.scrollThrottle(Date.now())) return false;
+      this.moveY = e.target.scrollTop;
+      this.moveX = e.target.scrollLeft;
+      this.updateSyncScroll();
     },
 
     // 初始化，获取浏览器滚动条的大小
@@ -2147,7 +2196,7 @@ var HappyScroll = { render: function render() {
         }
         if (moveTo === 'end') {
           // 竖向滚动条移动到底部
-          _this.slideX = _this.moveX = element.clientHeight;
+          _this.slideX = _this.moveX = element.clientWidth;
         }
 
         lastWidth = element.clientWidth;

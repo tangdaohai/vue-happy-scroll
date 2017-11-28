@@ -10,10 +10,10 @@ import uglify from 'rollup-plugin-uglify'
 import { minify } from 'uglify-es'
 import { name, author, homepage, version } from './package.json'
 
-const prod = process.env.NODE_ENV === 'production'
+const isMin = process.env.compile_type === 'min'
 export default {
   entry: 'src/index.js',
-  dest: `./docs/happy-scroll${prod ? '.min' : ''}.js`,
+  dest: `./docs/happy-scroll${isMin ? '.min' : ''}.js`,
   format: 'umd',
   moduleName: 'happy-scroll',
   sourceMap: true,
@@ -39,6 +39,6 @@ export default {
     babel({
       exclude: 'node_modules/**'
     }),
-    prod ? uglify({}, minify) : ''
+    isMin ? uglify({}, minify) : ''
   ]
 }
