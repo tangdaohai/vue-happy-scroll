@@ -69,6 +69,8 @@ https://happy-js.github.io/vue-happy-scroll/
      import Vue from 'vue'
 
      import HappyScroll from 'vue-happy-scroll'
+     // 引入css
+     import 'vue-happy-scroll/docs/happy-scroll.css'
      Vue.use(HappyScroll)
 
      //或者
@@ -88,6 +90,8 @@ https://happy-js.github.io/vue-happy-scroll/
    </template>
    <script>
      import { HappyScroll } from 'vue-happy-scroll'
+     // 引入css，推荐将css放入main入口中引入一次即可。
+     import 'vue-happy-scroll/docs/happy-scroll.css'
      export default {
          name: '',
          components: {HappyScroll} //在组件内注册

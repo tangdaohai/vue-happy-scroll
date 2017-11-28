@@ -2103,7 +2103,7 @@ var HappyScroll = { render: function render() {
     updateSyncScroll: debounce(function () {
       this.$emit('update:scrollTop', this.moveY);
       this.$emit('update:scrollLeft', this.moveX);
-    }, 200),
+    }, 50),
     // 监听dom元素的滚动事件，通知strip，将bar移动到对应位置
     onScroll: function onScroll(e) {
       // 节流
