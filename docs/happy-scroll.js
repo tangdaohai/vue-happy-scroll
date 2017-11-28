@@ -5,10 +5,12 @@
     github: https://github.com/happy-js/vue-happy-scroll#readme
   */
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global['happy-scroll'] = {})));
-}(this, (function (exports) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'vue'], factory) :
+	(factory((global['happy-scroll'] = {}),global.Vue$1));
+}(this, (function (exports,Vue$1) { 'use strict';
+
+Vue$1 = Vue$1 && Vue$1.hasOwnProperty('default') ? Vue$1['default'] : Vue$1;
 
 /**
  * 绑定事件
@@ -2164,7 +2166,7 @@ var HappyScroll = { render: function render() {
     // 判断浏览器滚动条的模式
     checkScrollMode: function checkScrollMode() {
       // eslint-disable-next-line
-      if (Vue._happyJS._isScrollNotUseSpace !== undefined) {
+      if (Vue$1._happyJS._isScrollNotUseSpace !== undefined) {
         // 如果不是undefined，说明已经判断过了
         return;
       }
@@ -2177,19 +2179,19 @@ var HappyScroll = { render: function render() {
         if (container.offsetWidth > container.clientWidth || container.offsetHeight > container.clientHeight) {
           // 滚动条一直存在的模式
           // eslint-disable-next-line
-          Vue._happyJS._isScrollNotUseSpace = false;
+          Vue$1._happyJS._isScrollNotUseSpace = false;
         } else {
           // eslint-disable-next-line
-          Vue._happyJS._isScrollNotUseSpace = true;
+          Vue$1._happyJS._isScrollNotUseSpace = true;
         }
         // eslint-disable-next-line
-        this.isScrollNotUseSpace = Vue._happyJS._isScrollNotUseSpace;
+        this.isScrollNotUseSpace = Vue$1._happyJS._isScrollNotUseSpace;
       }
     }
   },
   beforeCreate: function beforeCreate() {
     // eslint-disable-next-line
-    var happyJS = Vue._happyJS = Vue._happyJS || {};
+    var happyJS = Vue$1._happyJS = Vue$1._happyJS || {};
     /**
      * 判断当前浏览器滚动条存在的方式
      * true. 滚动时滚动条才会出现，悬浮在元素之上，不占用宽度(默认为此模式，但可以通过css隐藏滚动条，也属于不占用空间的模式，不过Firefox除外)

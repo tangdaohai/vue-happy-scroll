@@ -33,26 +33,6 @@ https://happy-js.github.io/vue-happy-scroll/
   npm i -D vue-happy-scroll
   ```
 
-  由于当前版本的module模块使用的ES6语法，所以在使用时还需在webpack中增加配置(`resolve('node_modules/vue-happy-scroll')`)
-
-  ```
-  module: {
-    rule: {
-      //...
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test'), resolve('node_modules/vue-happy-scroll')]
-      }
-    }
-  }
-  ```
-
-  ​
-
-  ​
-
-
 2. CDN
 
    当前是使用的[https://unpkg.com](https://unpkg.com)托管CDN，unpkg会自动与`npm`中版本保持同步。
@@ -158,12 +138,16 @@ https://happy-js.github.io/vue-happy-scroll/
 
 * 默认值`0`
 
+* 修饰符`sync`
+
 * 用法:
 
   ```html
   <happy-scroll scroll-top="20">
     <!-- 你的内容 -->
   </happy-scroll>
+  <!-- 也可以增加 .sync 保持scroll-top同步 -->
+  <happy-scroll scroll-top.sync="20">
   ```
 
   在组件`mounted`之后，设置`容器`距离顶部的距离。
@@ -178,12 +162,16 @@ https://happy-js.github.io/vue-happy-scroll/
 
 * 默认值`0`
 
+* 修饰符`sync`
+
 * 用法:
 
   ```html
   <happy-scroll scroll-left="20">
     <!-- 你的内容 -->
   </happy-scroll>
+  <!-- 也可以增加 .sync 保持scroll-left -->
+  <happy-scroll scroll-top.left="20">
   ```
 
   在组件`mounted`之后，设置`容器`距离左边的距离。

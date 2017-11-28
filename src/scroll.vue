@@ -33,6 +33,7 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import { generateThrottle } from './util'
 import HappyScrollStrip from './strip.vue'
 // @FIXME 需要一个更优的解决方案
