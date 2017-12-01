@@ -3,7 +3,9 @@ vue happy scroll
 
 
 <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/dm/vue-happy-scroll.svg" alt="Downloads"></a>
-  <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/v/vue-happy-scroll.svg" alt="Version"></a>
+<a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/v/vue-happy-scroll.svg" alt="Version"></a>
+<a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/github/issues-raw/happy-js/vue-happy-scroll.svg" alt="open issues"></a>
+<a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/github/issues-closed-raw/happy-js/vue-happy-scroll.svg" alt="closed issues"></a>
 <a href="https://www.npmjs.com/package/vue-happy-scroll"><img src="https://img.shields.io/npm/l/vue-happy-scroll.svg" alt="License"></a>
 ![欢迎PR](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
@@ -11,9 +13,12 @@ vue happy scroll
 | :----: | :-----: | :----: | :--: | :----------------------------: |
 |   √    |    √    |   √    |  √   | `9`  √<br />`10` √<br />`11` √ |
 
+> 当前版本不支持移动端(还未在移动端进行过测试)。The current version not support SP(I haven't tested it on the smartphone yet).
+
 ## Feature:
 * [x] 保留原生滚动条功能
 * [x] 支持动态设置滚动条颜色
+* [x] 支持设置滚动条的位置。左右(竖向滚动条)、上下(横向滚动)方向
 * [x] 支持隐藏滚动条
 * [x] 支持动态设定滚动位置，并支持top与left值同步
 * [x] 支持动态数据resize，滚动条自动隐藏与显示
@@ -148,6 +153,24 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
   设置滚动条的颜色
 
   > 建议使用`rgba`，这样可以为滚动条设置透明度，当然，如果你需要设置透明度的话。
+
+### size
+
+*  类型`Number|String`
+
+* 默认值`4`
+
+* 用法:
+
+```html
+  <happy-scroll size="8">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  设置滚动条的大小。
+
+  > 对于竖向滚动条表示宽度，竖向滚动条表示高度
 
 ### scroll-top
 
@@ -308,6 +331,35 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
 
   属性值与`smaller-move-h`原理一致。
 
+### left
+
+* 类型`Boolean`
+
+* 默认值`false`
+
+* 用法:
+
+  ```html
+  <happy-scroll left>
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+  表示设置`竖向`滚动条依靠在`左`边。默认竖向滚动条在右边。
+
+### top
+
+* 类型`Boolean`
+
+* 默认值`false`
+
+* 用法:
+
+  ```html
+  <happy-scroll top>
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+  表示设置`横向`滚动条依靠在`上`边。默认横向滚动条在下边。v
 ### throttle
 
 * 类型`Number`
