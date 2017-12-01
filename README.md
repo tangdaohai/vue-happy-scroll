@@ -24,6 +24,10 @@ https://happy-js.github.io/vue-happy-scroll/
 它可以让你无需关心滚动条的兼容性问题，无需关心`内容区域`的宽高，当设定`resize`属性后，可以根据内容大小`自动显示或隐藏滚动条`。
 这里有对各种丰富的[额外功能](https://github.com/happy-js/vue-happy-scroll#属性)进行说明。
 
+## 版本迭代计划列表
+
+https://github.com/happy-js/vue-happy-scroll/projects/1
+
 ## 安装
 
 1. npm
