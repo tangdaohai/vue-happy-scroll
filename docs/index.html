@@ -5,9 +5,9 @@
     <title>vue-happy-scroll</title>
     <link rel="stylesheet" href="./happy-scroll.css">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/element-ui"></script>
-    <script src="./happy-scroll.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="./happy-scroll.js"></script>
     <style>
       * {
         margin: 0;
@@ -69,8 +69,10 @@
             left
             :scroll-left.sync="scrollLeft"
             :scroll-top.sync="scrollTop"
-            bigger-move-h="end"
+            bigger-move-h="start"
             smaller-move-h="end"
+            bigger-move-v="start"
+            smaller-move-v="end"
             color="rgba(79, 192, 141, .7)"
             resize>
             <div class="text-box">

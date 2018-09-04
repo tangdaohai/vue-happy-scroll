@@ -1,6 +1,6 @@
 /*!
     name: vue-happy-scroll
-    version: 2.0.0
+    version: 2.0.1
     author: tangdaohai@outlook.com
     github: https://github.com/happy-js/vue-happy-scroll#readme
   */
@@ -303,7 +303,7 @@ var HappyScrollStrip = { render: function render() {
       this.$refs.strip.style.transform = this.config.translate + '(' + offset + 'px)';
 
       // 告诉scroll.vue 滚动条移动的偏移量
-      this.$emit('input', offset);
+      this.$emit('change', offset);
     }
   },
   created: function created() {
@@ -1992,11 +1992,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 var HappyScroll = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "happy-scroll", staticClass: "happy-scroll" }, [_c('div', { ref: "container", staticClass: "happy-scroll-container", style: [_vm.initSize], on: { "scroll": function scroll($event) {
           $event.stopPropagation();_vm.onScroll($event);
-        } } }, [_c('div', { ref: "content", staticClass: "happy-scroll-content", style: [_vm.contentBorderStyle] }, [_vm._t("default")], 2)]), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideVertical && _vm.percentageY < 1, expression: "!hideVertical && percentageY < 1" }], attrs: { "throttle": _vm.throttle, "percentage": _vm.percentageY, "move": _vm.moveY }, model: { value: _vm.slideY, callback: function callback($$v) {
-          _vm.slideY = $$v;
-        }, expression: "slideY" } }, 'happy-scroll-strip', _vm.$attrs, false)), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideHorizontal && _vm.percentageX < 1, expression: "!hideHorizontal && percentageX < 1" }], attrs: { "horizontal": "", "throttle": _vm.throttle, "percentage": _vm.percentageX, "move": _vm.moveX }, model: { value: _vm.slideX, callback: function callback($$v) {
-          _vm.slideX = $$v;
-        }, expression: "slideX" } }, 'happy-scroll-strip', _vm.$attrs, false))], 1);
+        } } }, [_c('div', { ref: "content", staticClass: "happy-scroll-content", style: [_vm.contentBorderStyle] }, [_vm._t("default")], 2)]), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideVertical && _vm.percentageY < 1, expression: "!hideVertical && percentageY < 1" }], attrs: { "throttle": _vm.throttle, "percentage": _vm.percentageY, "move": _vm.moveY }, on: { "change": _vm.slideYChange } }, 'happy-scroll-strip', _vm.$attrs, false)), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideHorizontal && _vm.percentageX < 1, expression: "!hideHorizontal && percentageX < 1" }], attrs: { "horizontal": "", "throttle": _vm.throttle, "percentage": _vm.percentageX, "move": _vm.moveX }, on: { "change": _vm.slideXChange } }, 'happy-scroll-strip', _vm.$attrs, false))], 1);
   }, staticRenderFns: [],
   name: 'happy-scroll',
   inheritAttrs: false,
@@ -2046,16 +2042,13 @@ var HappyScroll = { render: function render() {
   },
   data: function data() {
     return {
-      // 视图元素的容器的宽高，此处设置为40，是为了获取到浏览器滚动条的大小，在mounted之后会计算该属性
+      // 视图元素的容器的宽高，在mounted之后会计算该属性
       initSize: {},
-
       percentageX: 0, // 横向滚动条百分比
       moveX: +this.scrollLeft, // slot dom元素滚动的位置
-      slideX: 0, // 鼠标拖动滚动条的位置
 
       percentageY: 0, // 竖向滚动条百分比
       moveY: +this.scrollTop,
-      slideY: 0,
       // 监听scroll事件的节流函数
       scrollThrottle: generateThrottle(this.throttle),
       // 浏览器滚动条大小, 默认为15px
@@ -2067,17 +2060,6 @@ var HappyScroll = { render: function render() {
   },
 
   watch: {
-    // 鼠标拖动滚动条时，移动slot元素到对应位置
-    slideX: function slideX(newVal) {
-      this.$refs.container.scrollLeft = newVal / this.percentageX;
-      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft);
-    },
-    slideY: function slideY(newVal) {
-      this.$refs.container.scrollTop = newVal / this.percentageY;
-      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
-      this.$emit('update:scrollTop', this.$refs.container.scrollTop);
-    },
-
     // 监听（鼠标滑轮或者触摸板滑动） 滑动到指定位置
     scrollTop: function scrollTop(newVal) {
       this.$refs.container.scrollTop = this.moveY = +newVal;
@@ -2100,6 +2082,17 @@ var HappyScroll = { render: function render() {
     }
   },
   methods: {
+    // 模拟的滚动条位置发生了变动，修改 dom 对应的位置
+    slideYChange: function slideYChange(newVal) {
+      this.$refs.container.scrollTop = newVal / this.percentageY;
+      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
+      this.$emit('update:scrollTop', this.$refs.container.scrollTop);
+    },
+    slideXChange: function slideXChange(newVal) {
+      this.$refs.container.scrollLeft = newVal / this.percentageX;
+      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft);
+    },
+
     updateSyncScroll: debounce(function () {
       this.$emit('update:scrollTop', this.moveY);
       this.$emit('update:scrollLeft', this.moveX);
@@ -2154,51 +2147,62 @@ var HappyScroll = { render: function render() {
       });
 
       // 记录视图上次宽高的变化
-      var lastHeight = 0;
-      var lastWidth = 0;
-      elementResizeDetector$$1.listenTo(this.$refs.content, function () {
-        var element = _this.$slots.default[0]['elm'];
+      var ele = this.$slots.default[0]['elm'];
+      var lastHeight = ele.clientHeight;
+      var lastWidth = ele.clientWidth;
+      elementResizeDetector$$1.listenTo(ele, function (element) {
+        // const element = this.$slots.default[0]['elm']
+        console.log(element);
         // 初始化百分比
         _this.getPercentage();
         _this.initBrowserSize();
         // 获取竖向滚动条变小或者变大的移动策略
         var moveTo = void 0;
         if (element.clientHeight < lastHeight) {
+          // 高度变小
           moveTo = _this.smallerMoveH.toLocaleLowerCase();
         }
         if (element.clientHeight > lastHeight) {
+          // 高度变大
           moveTo = _this.biggerMoveH.toLocaleLowerCase();
         }
 
         if (moveTo === 'start') {
           // 竖向滚动条移动到顶部
-          _this.slideY = _this.moveY = 0;
+          _this.moveY = 0;
+          _this.slideYChange(_this.moveY);
         }
         if (moveTo === 'end') {
           // 竖向滚动条移动到底部
-          _this.slideY = _this.moveY = element.clientHeight;
+          _this.moveY = element.clientHeight;
+          _this.slideYChange(_this.moveY);
         }
 
+        // 记录此次的高度，用于下次变化后的比较
         lastHeight = element.clientHeight;
 
         // 获取横向向滚动条变小或者变大的移动策略
         moveTo = '';
         if (element.clientWidth < lastWidth) {
+          // 宽度变小
           moveTo = _this.smallerMoveV.toLocaleLowerCase();
         }
         if (element.clientWidth > lastWidth) {
+          // 宽度变大
           moveTo = _this.biggerMoveV.toLocaleLowerCase();
         }
-
         if (moveTo === 'start') {
-          // 竖向滚动条移动到顶部
-          _this.slideX = _this.moveX = 0;
+          // 横向滚动条移动到最左边
+          _this.moveX = 0;
+          _this.slideXChange(_this.moveX);
         }
         if (moveTo === 'end') {
-          // 竖向滚动条移动到底部
-          _this.slideX = _this.moveX = element.clientWidth;
+          // 竖向滚动条移动到最右边
+          _this.moveX = element.clientWidth;
+          _this.slideXChange(_this.moveX);
         }
 
+        // 记录此次的宽度，用于下次变化后的比较
         lastWidth = element.clientWidth;
       });
     },
@@ -2274,7 +2278,7 @@ var HappyScroll = { render: function render() {
   }
 };
 
-var version = "2.0.0";
+var version = "2.0.1";
 
 // 如果vue是全局变量,使用自动全局安装。
 if (typeof window !== 'undefined' && window.Vue) {

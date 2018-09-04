@@ -14,21 +14,21 @@
     <!-- 竖向垂直滚动条, 如果 percentageY 比例等于1不显示该滚动条 -->
     <happy-scroll-strip
       v-show="!hideVertical && percentageY < 1"
-      v-model="slideY"
       v-bind="$attrs"
       :throttle="throttle"
       :percentage="percentageY"
-      :move="moveY">
+      :move="moveY"
+      @change="slideYChange">
     </happy-scroll-strip>
     <!-- 横向水平滚动条 -->
     <happy-scroll-strip
       v-show="!hideHorizontal && percentageX < 1"
       horizontal
-      v-model="slideX"
       v-bind="$attrs"
       :throttle="throttle"
       :percentage="percentageX"
-      :move="moveX">
+      :move="moveX"
+      @change="slideXChange">
     </happy-scroll-strip>
   </div>
 </template>
@@ -92,17 +92,14 @@ export default {
   },
   data () {
     return {
-      // 视图元素的容器的宽高，此处设置为40，是为了获取到浏览器滚动条的大小，在mounted之后会计算该属性
+      // 视图元素的容器的宽高，在mounted之后会计算该属性
       initSize: {
       },
-
       percentageX: 0, // 横向滚动条百分比
       moveX: +this.scrollLeft, // slot dom元素滚动的位置
-      slideX: 0, // 鼠标拖动滚动条的位置
 
       percentageY: 0, // 竖向滚动条百分比
       moveY: +this.scrollTop,
-      slideY: 0,
       // 监听scroll事件的节流函数
       scrollThrottle: generateThrottle(this.throttle),
       // 浏览器滚动条大小, 默认为15px
@@ -113,16 +110,6 @@ export default {
     }
   },
   watch: {
-    // 鼠标拖动滚动条时，移动slot元素到对应位置
-    slideX (newVal) {
-      this.$refs.container.scrollLeft = newVal / this.percentageX
-      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
-    },
-    slideY (newVal) {
-      this.$refs.container.scrollTop = newVal / this.percentageY
-      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
-      this.$emit('update:scrollTop', this.$refs.container.scrollTop)
-    },
     // 监听（鼠标滑轮或者触摸板滑动） 滑动到指定位置
     scrollTop (newVal) {
       this.$refs.container.scrollTop = this.moveY = +newVal
@@ -145,6 +132,16 @@ export default {
     }
   },
   methods: {
+    // 模拟的滚动条位置发生了变动，修改 dom 对应的位置
+    slideYChange (newVal) {
+      this.$refs.container.scrollTop = newVal / this.percentageY
+      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
+      this.$emit('update:scrollTop', this.$refs.container.scrollTop)
+    },
+    slideXChange (newVal) {
+      this.$refs.container.scrollLeft = newVal / this.percentageX
+      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
+    },
     updateSyncScroll: debounce(function () {
       this.$emit('update:scrollTop', this.moveY)
       this.$emit('update:scrollLeft', this.moveX)
@@ -194,51 +191,60 @@ export default {
       })
 
       // 记录视图上次宽高的变化
-      let lastHeight = 0
-      let lastWidth = 0
-      elementResizeDetector.listenTo(this.$refs.content, () => {
-        const element = this.$slots.default[0]['elm']
+      const ele = this.$slots.default[0]['elm']
+      let lastHeight = ele.clientHeight
+      let lastWidth = ele.clientWidth
+      elementResizeDetector.listenTo(ele, (element) => {
         // 初始化百分比
         this.getPercentage()
         this.initBrowserSize()
         // 获取竖向滚动条变小或者变大的移动策略
         let moveTo
         if (element.clientHeight < lastHeight) {
+          // 高度变小
           moveTo = this.smallerMoveH.toLocaleLowerCase()
         }
         if (element.clientHeight > lastHeight) {
+          // 高度变大
           moveTo = this.biggerMoveH.toLocaleLowerCase()
         }
 
         if (moveTo === 'start') {
           // 竖向滚动条移动到顶部
-          this.slideY = this.moveY = 0
+          this.moveY = 0
+          this.slideYChange(this.moveY)
         }
         if (moveTo === 'end') {
           // 竖向滚动条移动到底部
-          this.slideY = this.moveY = element.clientHeight
+          this.moveY = element.clientHeight
+          this.slideYChange(this.moveY)
         }
 
+        // 记录此次的高度，用于下次变化后的比较
         lastHeight = element.clientHeight
 
         // 获取横向向滚动条变小或者变大的移动策略
         moveTo = ''
         if (element.clientWidth < lastWidth) {
+          // 宽度变小
           moveTo = this.smallerMoveV.toLocaleLowerCase()
         }
         if (element.clientWidth > lastWidth) {
+          // 宽度变大
           moveTo = this.biggerMoveV.toLocaleLowerCase()
         }
-
         if (moveTo === 'start') {
-          // 竖向滚动条移动到顶部
-          this.slideX = this.moveX = 0
+          // 横向滚动条移动到最左边
+          this.moveX = 0
+          this.slideXChange(this.moveX)
         }
         if (moveTo === 'end') {
-          // 竖向滚动条移动到底部
-          this.slideX = this.moveX = element.clientWidth
+          // 竖向滚动条移动到最右边
+          this.moveX = element.clientWidth
+          this.slideXChange(this.moveX)
         }
 
+        // 记录此次的宽度，用于下次变化后的比较
         lastWidth = element.clientWidth
       })
     },

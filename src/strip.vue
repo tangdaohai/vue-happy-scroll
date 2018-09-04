@@ -201,7 +201,7 @@ export default {
       this.$refs.strip.style.transform = `${this.config.translate}(${offset}px)`
 
       // 告诉scroll.vue 滚动条移动的偏移量
-      this.$emit('input', offset)
+      this.$emit('change', offset)
     }
   },
   created () {
