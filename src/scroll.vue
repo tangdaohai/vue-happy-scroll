@@ -328,6 +328,13 @@ export default {
       this.checkScrollMode()
       // 获取当前浏览器滚动条的宽高
       this.initBrowserSize()
+
+      this.$nextTick(() => {
+        // 因为 initBrowserSize 会有增加 20px border 的操作，所以需要等待这20px渲染完成后再进行操作
+        // 将视图dom移动到设定的位置
+        this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
+        this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
+      })
     })
 
     // 监听slot视图变化, 方法内部会判断是否设置了开启监听resize
@@ -336,10 +343,6 @@ export default {
     // 监听滚动条宽度变化，有滚动条 -> 无滚动条, 在mounted中监听是为了确保$refs可调用
     this.$watch('browserHSize', this.setContainerSize)
     this.$watch('browserVSize', this.setContainerSize)
-
-    // 将视图dom移动到设定的位置
-    this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
-    this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
   }
 }
 </script>
