@@ -62,9 +62,24 @@ export default {
       binded: false,
       // 滚动条的宽或者高
       length: 0,
+      // 滚动条空白区域 与 (用户内容元素的高度 - 视图区域的高度) 的比例
       percentage: 0,
+      // 滚动条最大的偏移量。这个值等于滚动条容器 减去 滚动条 的空白区域
+      maxOffset: 0,
+      // 记录当前的偏移量，用于触发 滚动到头部和尾部的事件
+      currentOffset: 0,
       // 鼠标移动的节流函数
       moveThrottle: generateThrottle(this.throttle)
+    }
+  },
+  watch: {
+    currentOffset (newVal) {
+      if (newVal === 0) {
+        // 触发事件
+        this.emitLocationEvent('start', 0)
+      } else if (newVal === this.maxOffset) {
+        this.emitLocationEvent('end', newVal / this.percentage)
+      }
     }
   },
   computed: {
@@ -86,14 +101,13 @@ export default {
 
       if (!this.$refs.stripContainer) return
 
-      const rect = this.$refs.stripContainer.getBoundingClientRect()
-      const maxOffset = rect[this.config.sizeAttr] - this.length
       if (offset < 0) {
         offset = 0
       }
-      if (offset > maxOffset) {
-        offset = maxOffset
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset
       }
+      this.currentOffset = offset
       return {
         transform: `${this.config.translate}(${offset}px)`
       }
@@ -107,6 +121,11 @@ export default {
     }
   },
   methods: {
+    // 触发滚动条滚动到顶部或底部的事件
+    emitLocationEvent (type, outsideOffset) {
+      const direction = this.horizontal ? 'horizontal' : 'vertical'
+      this.$emit(`${direction}-${type}`, outsideOffset)
+    },
     /**
      * scrollSize 如果是竖向滚动条，则为 用户内容元素的 scrollHeight, 横向的则作为 用户内容元素的 scrollWidth
      * clientSize 可视区域的 clientHeight clientWidth. 横竖的原理同scrollSize
@@ -130,7 +149,7 @@ export default {
       // 判断是否滚动条长度是否已经小于了设置的最小长度
       this.length = this.length < minLength ? minLength : this.length
       // 滚动条容器 - 滚动条长度 = 剩余的空间
-      const space = currentSize - this.length
+      const space = this.maxOffset = currentSize - this.length
       /**
        * 这里计算一个比例
        * 已高度举例子:
@@ -207,24 +226,21 @@ export default {
       this.changeOffset(offset, event)
     },
     changeOffset (offset, event) {
-      const rect = this.$refs.stripContainer.getBoundingClientRect()
-      const maxOffset = rect[this.config.sizeAttr] - this.length
-
       // 防止滚动条越界
       if (offset < 0) {
         offset = 0
       }
 
       // 防止滚动条越界
-      if (offset > maxOffset) {
-        offset = maxOffset
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset
       }
 
-      if (event && offset > 0 && offset < maxOffset) {
+      if (event && offset > 0 && offset < this.maxOffset) {
         event.preventDefault()
         event.stopImmediatePropagation()
       }
-
+      this.currentOffset = offset
       // 偏移
       this.$refs.strip.style.transform = `${this.config.translate}(${offset}px)`
 

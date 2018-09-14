@@ -16,6 +16,7 @@
       ref="stripY"
       v-if="!hideVertical"
       v-bind="$attrs"
+      v-on="$listeners"
       :throttle="throttle"
       :move="moveY"
       @change="slideYChange">
@@ -26,6 +27,7 @@
       v-if="!hideHorizontal"
       horizontal
       v-bind="$attrs"
+      v-on="$listeners"
       :throttle="throttle"
       :move="moveX"
       @change="slideXChange">

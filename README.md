@@ -430,6 +430,66 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
 
   设置鼠标拖动滚动条的节流时间，如果没有特殊的要求不建议修改此值。
 
+## 事件
+
+### horizontal-start
+
+* 参数`scrollLeft`
+
+  > 在`horizontal-start`事件下，`scrollLeft`始终为`0`。
+
+* 说明
+  监听横向滚动条滚动到`头部`的事件。当`scroll-left = 0`时会触发该事件。
+
+  ```html
+  <happy-scroll @horizontal-start="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+### horizontal-end
+
+* 参数`scrollLeft`
+
+* 说明
+  监听横向滚动条滚动到`尾部`的事件。
+
+  ```html
+  <happy-scroll @horizontal-end="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+
+### vertical-start
+
+* 参数`scrollTop`
+
+  > 在`vertical-start`事件下，`scrollTop`始终为`0`
+
+* 说明
+  监听竖向滚动条滚动到`头部`的事件。当`scroll-top = 0`时会触发该事件。
+
+  ```html
+  <happy-scroll @vertical-start="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+### vertical-start
+
+* 参数`scrollTop`
+
+* 说明
+  监听竖向滚动条滚动到`尾部`的事件。
+
+  ```html
+  <happy-scroll @vertical-end="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+
 ## PR
 期待并欢迎您的PR。
 但请您一定要遵守[standard](https://github.com/standard/standard)代码风格规范。
