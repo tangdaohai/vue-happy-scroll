@@ -2,7 +2,7 @@
     name: vue-happy-scroll
     version: 2.0.1
     author: tangdaohai@outlook.com
-    github: https://github.com/happy-js/vue-happy-scroll#readme
+    github: https://github.com/tangdaohai/vue-happy-scroll#readme
   */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue')) :

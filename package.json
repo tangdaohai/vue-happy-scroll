@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/happy-js/vue-happy-scroll.git"
+    "url": "git+https://github.com/tangdaohai/vue-happy-scroll.git"
   },
   "keywords": [
     "vue",
@@ -25,9 +25,9 @@
   "author": "tangdaohai@outlook.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/happy-js/vue-happy-scroll/issues"
+    "url": "https://github.com/tangdaohai/vue-happy-scroll/issues"
   },
-  "homepage": "https://github.com/happy-js/vue-happy-scroll#readme",
+  "homepage": "https://github.com/tangdaohai/vue-happy-scroll#readme",
   "dependencies": {
     "element-resize-detector": "^1.1.12",
     "vue": "^2.0.0"
