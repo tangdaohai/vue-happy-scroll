@@ -12,11 +12,13 @@ import { name, author, homepage, version } from './package.json'
 
 const isMin = process.env.compile_type === 'min'
 export default {
-  entry: 'src/index.js',
-  dest: `./docs/happy-scroll${isMin ? '.min' : ''}.js`,
-  format: 'umd',
-  moduleName: 'happy-scroll',
-  sourceMap: true,
+  input: 'src/index.js',
+  output: {
+    file: `./docs/happy-scroll${isMin ? '.min' : ''}.js`,
+    format: 'umd'
+  },
+  name: 'happy-scroll',
+  sourcemap: true,
   external: ['vue'],
   banner: `/*!
     name: ${name}
