@@ -1,5 +1,5 @@
-<a name="2.0.1"></a>
-## [2.0.1](https://github.com/tangdaohai/vue-happy-scroll/compare/v2.0.0...v2.0.1) (2018-09-17)
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/tangdaohai/vue-happy-scroll/compare/v2.0.0...v2.1.0) (2018-09-17)
 
 
 ### Bug Fixes
@@ -13,11 +13,6 @@
 
 * **scroll event:** support vertical-start,vertical-end,horizontal-start,horizontal-end events. ([ac5645d](https://github.com/tangdaohai/vue-happy-scroll/commit/ac5645d))
 * **scroll min-length:** support min length. ([#13](https://github.com/tangdaohai/vue-happy-scroll/issues/13)) ([5c77332](https://github.com/tangdaohai/vue-happy-scroll/commit/5c77332))
-
-
-
-<a name="2.0.0"></a>
-# 2.0.0 (2017-11-28)
 
 
 

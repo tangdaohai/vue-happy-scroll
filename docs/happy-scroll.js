@@ -1,6 +1,6 @@
 /*!
     name: vue-happy-scroll
-    version: 2.0.1
+    version: 2.1.0
     author: tangdaohai@outlook.com
     github: https://github.com/tangdaohai/vue-happy-scroll#readme
   */
@@ -2355,7 +2355,7 @@ var HappyScroll = { render: function render() {
   }
 };
 
-var version = "2.0.1";
+var version = "2.1.0";
 
 // 如果vue是全局变量,使用自动全局安装。
 if (typeof window !== 'undefined' && window.Vue) {
