@@ -476,7 +476,7 @@ https://github.com/tangdaohai/vue-happy-scroll/projects/1
   </happy-scroll>
   ```
 
-### vertical-start
+### vertical-end
 
 * 参数`scrollTop`
 
