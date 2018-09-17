@@ -111,7 +111,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var HappyScrollStrip = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "stripContainer", staticClass: "happy-scroll-strip", class: [_vm.horizontal ? 'happy-scroll-strip--horizontal' : 'happy-scroll-strip--vertical'], style: [_vm.initLocation], on: { "!wheel": function wheel($event) {
           $event.stopPropagation();_vm.handlerWheel($event);
-        } } }, [_c('div', { ref: "strip", staticClass: "happy-scroll-bar", style: [_vm.translate, _vm.initStrip, _vm.initSize, { background: _vm.color }], on: { "mousedown": function mousedown($event) {
+        } } }, [_c('div', { ref: "strip", staticClass: "happy-scroll-bar", style: [_vm.translate, _defineProperty({}, _vm.config.sizeAttr, _vm.length + 'px'), _vm.initSize, { background: _vm.color }, { opacity: _vm.isOpacity }], on: { "mousedown": function mousedown($event) {
           $event.stopPropagation();_vm.handlerMouseDown($event);
         } } })]);
   }, staticRenderFns: [],
@@ -123,10 +123,6 @@ var HappyScrollStrip = { render: function render() {
     left: Boolean,
     // 使横向滚动条居右
     top: Boolean,
-    percentage: {
-      type: Number,
-      required: true
-    },
     move: {
       type: Number,
       default: 0
@@ -135,6 +131,16 @@ var HappyScrollStrip = { render: function render() {
     size: {
       type: [Number, String],
       default: 4
+    },
+    // 竖向的 滚动条的最小长度，当滚动条长度随元素比例缩小到一定程度时不再缩小。
+    minLengthV: {
+      type: Number,
+      default: 40
+    },
+    // 横向的 滚动条的最小长度，当滚动条长度随元素比例缩小到一定程度时不再缩小。
+    minLengthH: {
+      type: Number,
+      default: 40
     },
     // 滚动条的背景色
     color: {
@@ -156,30 +162,36 @@ var HappyScrollStrip = { render: function render() {
       binded: false,
       // 滚动条的宽或者高
       length: 0,
+      // 滚动条空白区域 与 (用户内容元素的高度 - 视图区域的高度) 的比例
+      percentage: 0,
+      // 滚动条最大的偏移量。这个值等于滚动条容器 减去 滚动条 的空白区域
+      maxOffset: 0,
+      // 记录当前的偏移量，用于触发 滚动到头部和尾部的事件
+      currentOffset: 0,
       // 鼠标移动的节流函数
       moveThrottle: generateThrottle(this.throttle)
     };
   },
 
+  watch: {
+    currentOffset: function currentOffset(newVal) {
+      if (newVal === 0) {
+        // 触发事件
+        this.emitLocationEvent('start', 0);
+      } else if (newVal === this.maxOffset) {
+        this.emitLocationEvent('end', newVal / this.percentage);
+      }
+    }
+  },
   computed: {
-    // 初始化宽度(横向时为高度)
+    // 初始化滚动条的大小 (横向时为高度，竖向时为宽度)
     initSize: function initSize() {
       return _defineProperty({}, this.horizontal ? 'height' : 'width', this.size + 'px');
     },
 
-    /**
-     * 初始化滚动条的长度, 这个方法会被执行两次。
-     */
-    initStrip: function initStrip() {
-      var container = this.$refs.stripContainer; // 滚动条的容器
-
-      if (!this.percentage && !container) {
-        return;
-      }
-      // 滚动条的高度或宽度 = 滚动条容器(100%高) * 百分比(外层内容与容器的比例)
-      var number = this.length = container[this.config.client] * this.percentage;
-      // 根据 水平还是垂直方向 决定初始化滚动条的 宽还是高
-      return _defineProperty({}, this.config.sizeAttr, number + 'px');
+    // 当 percentage 大于等于 1 时，说明不需要显示滚动条
+    isOpacity: function isOpacity() {
+      return this.percentage < 1 ? 1 : 0;
     },
 
     /**
@@ -190,14 +202,13 @@ var HappyScrollStrip = { render: function render() {
 
       if (!this.$refs.stripContainer) return;
 
-      var rect = this.$refs.stripContainer.getBoundingClientRect();
-      var maxOffset = rect[this.config.sizeAttr] - this.length;
       if (offset < 0) {
         offset = 0;
       }
-      if (offset > maxOffset) {
-        offset = maxOffset;
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset;
       }
+      this.currentOffset = offset;
       return {
         transform: this.config.translate + '(' + offset + 'px)'
       };
@@ -212,6 +223,45 @@ var HappyScrollStrip = { render: function render() {
     }
   },
   methods: {
+    // 触发滚动条滚动到顶部或底部的事件
+    emitLocationEvent: function emitLocationEvent(type, outsideOffset) {
+      var direction = this.horizontal ? 'horizontal' : 'vertical';
+      this.$emit(direction + '-' + type, outsideOffset);
+    },
+
+    /**
+     * scrollSize 如果是竖向滚动条，则为 用户内容元素的 scrollHeight, 横向的则作为 用户内容元素的 scrollWidth
+     * clientSize 可视区域的 clientHeight clientWidth. 横竖的原理同scrollSize
+     */
+    computeStrip: function computeStrip(scrollSize, clientSize) {
+      // const container = this.$refs.stripContainer // 滚动条的容器
+      var currentSize = this.$refs.stripContainer[this.config.client];
+      /**
+       * 滚动条长度。
+       *
+       * clientSize / scrollSize 是表示视图范围与用户内容元素的比例
+       * 用此比例来决定 滚动条的长度 滚动条容器 * 比例 = 滚动条长度
+       * 但是当用户内容元素无限大的时候，可能会导致滚动条无限小，所以会设置最小长度
+       */
+      this.length = currentSize * (clientSize / scrollSize);
+      var minLength = this.horizontal ? this.minLengthH : this.minLengthV;
+      if (minLength < 1) {
+        // 按百分比处理
+        minLength = currentSize * minLength;
+      }
+      // 判断是否滚动条长度是否已经小于了设置的最小长度
+      this.length = this.length < minLength ? minLength : this.length;
+      // 滚动条容器 - 滚动条长度 = 剩余的空间
+      var space = this.maxOffset = currentSize - this.length;
+      /**
+       * 这里计算一个比例
+       * 已高度举例子:
+       * 使用 剩余空间 除以 (用户内容元素的高度 - 视图区域的高度)
+       * 可以把 视图区域的高度 比作 滚动条的长度 用户内容元素的高度 比作 滚动条容器的高度
+       * 所以使用两者剩余空间的比例，来计算 当滚动条滑动1px的时候 用户内容元素应该滑动多少 px，当用户内容元素移动时 来计算 滚动条应该移动多少px
+       */
+      this.percentage = space / (scrollSize - clientSize);
+    },
     bindEvents: function bindEvents() {
       // 已绑定过了 不再重复绑定
       if (this.binded) return;
@@ -281,29 +331,26 @@ var HappyScrollStrip = { render: function render() {
       this.changeOffset(offset, event);
     },
     changeOffset: function changeOffset(offset, event) {
-      var rect = this.$refs.stripContainer.getBoundingClientRect();
-      var maxOffset = rect[this.config.sizeAttr] - this.length;
-
       // 防止滚动条越界
       if (offset < 0) {
         offset = 0;
       }
 
       // 防止滚动条越界
-      if (offset > maxOffset) {
-        offset = maxOffset;
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset;
       }
 
-      if (event && offset > 0 && offset < maxOffset) {
+      if (event && offset > 0 && offset < this.maxOffset) {
         event.preventDefault();
         event.stopImmediatePropagation();
       }
-
+      this.currentOffset = offset;
       // 偏移
       this.$refs.strip.style.transform = this.config.translate + '(' + offset + 'px)';
 
       // 告诉scroll.vue 滚动条移动的偏移量
-      this.$emit('change', offset);
+      this.$emit('change', offset / this.percentage);
     }
   },
   created: function created() {
@@ -1992,7 +2039,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 var HappyScroll = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "happy-scroll", staticClass: "happy-scroll" }, [_c('div', { ref: "container", staticClass: "happy-scroll-container", style: [_vm.initSize], on: { "scroll": function scroll($event) {
           $event.stopPropagation();_vm.onScroll($event);
-        } } }, [_c('div', { ref: "content", staticClass: "happy-scroll-content", style: [_vm.contentBorderStyle] }, [_vm._t("default")], 2)]), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideVertical && _vm.percentageY < 1, expression: "!hideVertical && percentageY < 1" }], attrs: { "throttle": _vm.throttle, "percentage": _vm.percentageY, "move": _vm.moveY }, on: { "change": _vm.slideYChange } }, 'happy-scroll-strip', _vm.$attrs, false)), _c('happy-scroll-strip', _vm._b({ directives: [{ name: "show", rawName: "v-show", value: !_vm.hideHorizontal && _vm.percentageX < 1, expression: "!hideHorizontal && percentageX < 1" }], attrs: { "horizontal": "", "throttle": _vm.throttle, "percentage": _vm.percentageX, "move": _vm.moveX }, on: { "change": _vm.slideXChange } }, 'happy-scroll-strip', _vm.$attrs, false))], 1);
+        } } }, [_c('div', { ref: "content", staticClass: "happy-scroll-content", style: [_vm.contentBorderStyle] }, [_vm._t("default")], 2)]), !_vm.hideVertical ? _c('happy-scroll-strip', _vm._g(_vm._b({ ref: "stripY", attrs: { "throttle": _vm.throttle, "move": _vm.moveY }, on: { "change": _vm.slideYChange } }, 'happy-scroll-strip', _vm.$attrs, false), _vm.$listeners)) : _vm._e(), !_vm.hideHorizontal ? _c('happy-scroll-strip', _vm._g(_vm._b({ ref: "stripX", attrs: { "horizontal": "", "throttle": _vm.throttle, "move": _vm.moveX }, on: { "change": _vm.slideXChange } }, 'happy-scroll-strip', _vm.$attrs, false), _vm.$listeners)) : _vm._e()], 1);
   }, staticRenderFns: [],
   name: 'happy-scroll',
   inheritAttrs: false,
@@ -2044,18 +2091,17 @@ var HappyScroll = { render: function render() {
     return {
       // 视图元素的容器的宽高，在mounted之后会计算该属性
       initSize: {},
-      percentageX: 0, // 横向滚动条百分比
+      // 横向的
       moveX: +this.scrollLeft, // slot dom元素滚动的位置
-
-      percentageY: 0, // 竖向滚动条百分比
+      // 竖向的
       moveY: +this.scrollTop,
       // 监听scroll事件的节流函数
       scrollThrottle: generateThrottle(this.throttle),
-      // 浏览器滚动条大小, 默认为15px
+      // 浏览器滚动条所占空间的大小, 默认为15px
       browserHSize: 0,
       browserVSize: 0,
-      // 滚动条的模式，表示占用宽度还是悬浮在元素上
-      isScrollNotUseSpace: true
+      // 滚动条的模式，表示占用宽度还是悬浮在元素上(macOS系统可以设置滚动条悬浮在元素上，不会占用元素的空间)
+      isScrollNotUseSpace: undefined
     };
   },
 
@@ -2066,6 +2112,20 @@ var HappyScroll = { render: function render() {
     },
     scrollLeft: function scrollLeft(newVal) {
       this.$refs.container.scrollLeft = this.moveX = +newVal;
+    },
+
+    // 监听动态开启或关闭对应的滚动条
+    hideVertical: function hideVertical(newVal) {
+      if (!newVal) {
+        // 如果将禁用修改为启用，等子组件渲染后 再计算比例
+        this.$nextTick(this.computeStripY);
+      }
+    },
+    hideHorizontal: function hideHorizontal(newVal) {
+      if (!newVal) {
+        // 如果将禁用修改为启用，等子组件渲染后 再计算比例
+        this.$nextTick(this.computeStripX);
+      }
     }
   },
   computed: {
@@ -2084,12 +2144,12 @@ var HappyScroll = { render: function render() {
   methods: {
     // 模拟的滚动条位置发生了变动，修改 dom 对应的位置
     slideYChange: function slideYChange(newVal) {
-      this.$refs.container.scrollTop = newVal / this.percentageY;
+      this.$refs.container.scrollTop = newVal;
       // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
       this.$emit('update:scrollTop', this.$refs.container.scrollTop);
     },
     slideXChange: function slideXChange(newVal) {
-      this.$refs.container.scrollLeft = newVal / this.percentageX;
+      this.$refs.container.scrollLeft = newVal;
       this.$emit('update:scrollLeft', this.$refs.container.scrollLeft);
     },
 
@@ -2123,14 +2183,27 @@ var HappyScroll = { render: function render() {
       }
     },
 
-    // 获取滚动条百分比
-    getPercentage: function getPercentage() {
+    // 计算横向滚动条宽度度与元素宽度百分比
+    computeStripX: function computeStripX() {
+      if (this.hideHorizontal) {
+        // 没有开启横向滚动条
+        return;
+      }
+      var clientEle = this.$refs['happy-scroll'];
+      var slotEle = this.$slots.default[0]['elm'];
+      this.$refs.stripX.computeStrip(slotEle.scrollWidth, clientEle.clientWidth);
+    },
+
+    // 计算横向滚动条高度与元素高度百分比
+    computeStripY: function computeStripY() {
+      if (this.hideVertical) {
+        // 没有开启竖向滚动条
+        return;
+      }
       var clientEle = this.$refs['happy-scroll'];
       var slotEle = this.$slots.default[0]['elm'];
       // 竖向滚动条高度与元素高度百分比
-      this.percentageY = clientEle.clientHeight / slotEle.scrollHeight;
-      // 横向滚动条高度与元素宽度百分比
-      this.percentageX = clientEle.clientWidth / slotEle.scrollWidth;
+      this.$refs.stripY.computeStrip(slotEle.scrollHeight, clientEle.clientHeight);
     },
 
     // slot视图大小变化时的监听
@@ -2151,10 +2224,9 @@ var HappyScroll = { render: function render() {
       var lastHeight = ele.clientHeight;
       var lastWidth = ele.clientWidth;
       elementResizeDetector$$1.listenTo(ele, function (element) {
-        // const element = this.$slots.default[0]['elm']
-        console.log(element);
         // 初始化百分比
-        _this.getPercentage();
+        _this.computeStripX();
+        _this.computeStripY();
         _this.initBrowserSize();
         // 获取竖向滚动条变小或者变大的移动策略
         var moveTo = void 0;
@@ -2258,11 +2330,20 @@ var HappyScroll = { render: function render() {
     // 计算最外层宽高，设置滚动条元素的宽高
     this.setContainerSize();
     this.$nextTick(function () {
-      _this2.getPercentage();
+      // 使滚动条进行计算比例
+      _this2.computeStripX();
+      _this2.computeStripY();
       // 判断当前浏览器滚动条的模式，依据slot元素高度，如果高度大于视图高度，则出现滚动条了，此时再判断滚动条的模式
       _this2.checkScrollMode();
       // 获取当前浏览器滚动条的宽高
       _this2.initBrowserSize();
+
+      _this2.$nextTick(function () {
+        // 因为 initBrowserSize 会有增加 20px border 的操作，所以需要等待这20px渲染完成后再进行操作
+        // 将视图dom移动到设定的位置
+        _this2.scrollTop && (_this2.$refs.container.scrollTop = +_this2.scrollTop);
+        _this2.scrollLeft && (_this2.$refs.container.scrollLeft = +_this2.scrollLeft);
+      });
     });
 
     // 监听slot视图变化, 方法内部会判断是否设置了开启监听resize
@@ -2271,10 +2352,6 @@ var HappyScroll = { render: function render() {
     // 监听滚动条宽度变化，有滚动条 -> 无滚动条, 在mounted中监听是为了确保$refs可调用
     this.$watch('browserHSize', this.setContainerSize);
     this.$watch('browserVSize', this.setContainerSize);
-
-    // 将视图dom移动到设定的位置
-    this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop);
-    this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft);
   }
 };
 

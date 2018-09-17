@@ -38,5 +38,10 @@
   display: none;
 }
 .happy-scroll-container {
-    overflow: auto;
+  overflow: auto;
+}
+
+.happy-scroll-container .happy-scroll-content{
+  /* 解决横向滚动差 20px 的问题 */
+  display: inline-block;
 }
