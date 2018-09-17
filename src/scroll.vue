@@ -3,32 +3,34 @@
   <div class="happy-scroll" ref="happy-scroll">
     <!-- 出现滚动条的元素 -->
     <div class="happy-scroll-container" ref="container" :style="[initSize]" @scroll.stop="onScroll">
-      <!-- 内容元素 -->
+      <!-- 视图元素 此元素 >= 内容元素的宽高 -->
       <div class="happy-scroll-content"
         ref="content"
         :style="[contentBorderStyle]">
-        <!-- 视图元素 -->
+        <!-- 用户的内容元素 -->
         <slot></slot>
       </div>
     </div>
-    <!-- 竖向垂直滚动条, 如果 percentageY 比例等于1不显示该滚动条 -->
+    <!-- 竖向垂直滚动条 -->
     <happy-scroll-strip
-      v-show="!hideVertical && percentageY < 1"
-      v-model="slideY"
+      ref="stripY"
+      v-if="!hideVertical"
       v-bind="$attrs"
+      v-on="$listeners"
       :throttle="throttle"
-      :percentage="percentageY"
-      :move="moveY">
+      :move="moveY"
+      @change="slideYChange">
     </happy-scroll-strip>
     <!-- 横向水平滚动条 -->
     <happy-scroll-strip
-      v-show="!hideHorizontal && percentageX < 1"
+      ref="stripX"
+      v-if="!hideHorizontal"
       horizontal
-      v-model="slideX"
       v-bind="$attrs"
+      v-on="$listeners"
       :throttle="throttle"
-      :percentage="percentageX"
-      :move="moveX">
+      :move="moveX"
+      @change="slideXChange">
     </happy-scroll-strip>
   </div>
 </template>
@@ -92,43 +94,42 @@ export default {
   },
   data () {
     return {
-      // 视图元素的容器的宽高，此处设置为40，是为了获取到浏览器滚动条的大小，在mounted之后会计算该属性
+      // 视图元素的容器的宽高，在mounted之后会计算该属性
       initSize: {
       },
-
-      percentageX: 0, // 横向滚动条百分比
+      // 横向的
       moveX: +this.scrollLeft, // slot dom元素滚动的位置
-      slideX: 0, // 鼠标拖动滚动条的位置
-
-      percentageY: 0, // 竖向滚动条百分比
+      // 竖向的
       moveY: +this.scrollTop,
-      slideY: 0,
       // 监听scroll事件的节流函数
       scrollThrottle: generateThrottle(this.throttle),
-      // 浏览器滚动条大小, 默认为15px
+      // 浏览器滚动条所占空间的大小, 默认为15px
       browserHSize: 0,
       browserVSize: 0,
-      // 滚动条的模式，表示占用宽度还是悬浮在元素上
-      isScrollNotUseSpace: true
+      // 滚动条的模式，表示占用宽度还是悬浮在元素上(macOS系统可以设置滚动条悬浮在元素上，不会占用元素的空间)
+      isScrollNotUseSpace: undefined
     }
   },
   watch: {
-    // 鼠标拖动滚动条时，移动slot元素到对应位置
-    slideX (newVal) {
-      this.$refs.container.scrollLeft = newVal / this.percentageX
-      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
-    },
-    slideY (newVal) {
-      this.$refs.container.scrollTop = newVal / this.percentageY
-      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
-      this.$emit('update:scrollTop', this.$refs.container.scrollTop)
-    },
     // 监听（鼠标滑轮或者触摸板滑动） 滑动到指定位置
     scrollTop (newVal) {
       this.$refs.container.scrollTop = this.moveY = +newVal
     },
     scrollLeft (newVal) {
       this.$refs.container.scrollLeft = this.moveX = +newVal
+    },
+    // 监听动态开启或关闭对应的滚动条
+    hideVertical (newVal) {
+      if (!newVal) {
+        // 如果将禁用修改为启用，等子组件渲染后 再计算比例
+        this.$nextTick(this.computeStripY)
+      }
+    },
+    hideHorizontal (newVal) {
+      if (!newVal) {
+        // 如果将禁用修改为启用，等子组件渲染后 再计算比例
+        this.$nextTick(this.computeStripX)
+      }
     }
   },
   computed: {
@@ -145,6 +146,16 @@ export default {
     }
   },
   methods: {
+    // 模拟的滚动条位置发生了变动，修改 dom 对应的位置
+    slideYChange (newVal) {
+      this.$refs.container.scrollTop = newVal
+      // this.$refs.container.scrollTop 会在渲染之后被自动调整，所以这里重新取值
+      this.$emit('update:scrollTop', this.$refs.container.scrollTop)
+    },
+    slideXChange (newVal) {
+      this.$refs.container.scrollLeft = newVal
+      this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
+    },
     updateSyncScroll: debounce(function () {
       this.$emit('update:scrollTop', this.moveY)
       this.$emit('update:scrollLeft', this.moveX)
@@ -173,14 +184,26 @@ export default {
         this.browserVSize = (this.$refs.container.offsetHeight - this.$refs.container.clientHeight)
       }
     },
-    // 获取滚动条百分比
-    getPercentage () {
+    // 计算横向滚动条宽度度与元素宽度百分比
+    computeStripX () {
+      if (this.hideHorizontal) {
+        // 没有开启横向滚动条
+        return
+      }
+      const clientEle = this.$refs['happy-scroll']
+      const slotEle = this.$slots.default[0]['elm']
+      this.$refs.stripX.computeStrip(slotEle.scrollWidth, clientEle.clientWidth)
+    },
+    // 计算横向滚动条高度与元素高度百分比
+    computeStripY () {
+      if (this.hideVertical) {
+        // 没有开启竖向滚动条
+        return
+      }
       const clientEle = this.$refs['happy-scroll']
       const slotEle = this.$slots.default[0]['elm']
       // 竖向滚动条高度与元素高度百分比
-      this.percentageY = clientEle.clientHeight / slotEle.scrollHeight
-      // 横向滚动条高度与元素宽度百分比
-      this.percentageX = clientEle.clientWidth / slotEle.scrollWidth
+      this.$refs.stripY.computeStrip(slotEle.scrollHeight, clientEle.clientHeight)
     },
     // slot视图大小变化时的监听
     resizeListener () {
@@ -194,51 +217,61 @@ export default {
       })
 
       // 记录视图上次宽高的变化
-      let lastHeight = 0
-      let lastWidth = 0
-      elementResizeDetector.listenTo(this.$refs.content, () => {
-        const element = this.$slots.default[0]['elm']
+      const ele = this.$slots.default[0]['elm']
+      let lastHeight = ele.clientHeight
+      let lastWidth = ele.clientWidth
+      elementResizeDetector.listenTo(ele, (element) => {
         // 初始化百分比
-        this.getPercentage()
+        this.computeStripX()
+        this.computeStripY()
         this.initBrowserSize()
         // 获取竖向滚动条变小或者变大的移动策略
         let moveTo
         if (element.clientHeight < lastHeight) {
+          // 高度变小
           moveTo = this.smallerMoveH.toLocaleLowerCase()
         }
         if (element.clientHeight > lastHeight) {
+          // 高度变大
           moveTo = this.biggerMoveH.toLocaleLowerCase()
         }
 
         if (moveTo === 'start') {
           // 竖向滚动条移动到顶部
-          this.slideY = this.moveY = 0
+          this.moveY = 0
+          this.slideYChange(this.moveY)
         }
         if (moveTo === 'end') {
           // 竖向滚动条移动到底部
-          this.slideY = this.moveY = element.clientHeight
+          this.moveY = element.clientHeight
+          this.slideYChange(this.moveY)
         }
 
+        // 记录此次的高度，用于下次变化后的比较
         lastHeight = element.clientHeight
 
         // 获取横向向滚动条变小或者变大的移动策略
         moveTo = ''
         if (element.clientWidth < lastWidth) {
+          // 宽度变小
           moveTo = this.smallerMoveV.toLocaleLowerCase()
         }
         if (element.clientWidth > lastWidth) {
+          // 宽度变大
           moveTo = this.biggerMoveV.toLocaleLowerCase()
         }
-
         if (moveTo === 'start') {
-          // 竖向滚动条移动到顶部
-          this.slideX = this.moveX = 0
+          // 横向滚动条移动到最左边
+          this.moveX = 0
+          this.slideXChange(this.moveX)
         }
         if (moveTo === 'end') {
-          // 竖向滚动条移动到底部
-          this.slideX = this.moveX = element.clientWidth
+          // 竖向滚动条移动到最右边
+          this.moveX = element.clientWidth
+          this.slideXChange(this.moveX)
         }
 
+        // 记录此次的宽度，用于下次变化后的比较
         lastWidth = element.clientWidth
       })
     },
@@ -290,11 +323,20 @@ export default {
     // 计算最外层宽高，设置滚动条元素的宽高
     this.setContainerSize()
     this.$nextTick(() => {
-      this.getPercentage()
+      // 使滚动条进行计算比例
+      this.computeStripX()
+      this.computeStripY()
       // 判断当前浏览器滚动条的模式，依据slot元素高度，如果高度大于视图高度，则出现滚动条了，此时再判断滚动条的模式
       this.checkScrollMode()
       // 获取当前浏览器滚动条的宽高
       this.initBrowserSize()
+
+      this.$nextTick(() => {
+        // 因为 initBrowserSize 会有增加 20px border 的操作，所以需要等待这20px渲染完成后再进行操作
+        // 将视图dom移动到设定的位置
+        this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
+        this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
+      })
     })
 
     // 监听slot视图变化, 方法内部会判断是否设置了开启监听resize
@@ -303,10 +345,6 @@ export default {
     // 监听滚动条宽度变化，有滚动条 -> 无滚动条, 在mounted中监听是为了确保$refs可调用
     this.$watch('browserHSize', this.setContainerSize)
     this.$watch('browserVSize', this.setContainerSize)
-
-    // 将视图dom移动到设定的位置
-    this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
-    this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
   }
 }
 </script>

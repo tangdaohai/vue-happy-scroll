@@ -5,9 +5,9 @@
     <title>vue-happy-scroll</title>
     <link rel="stylesheet" href="./happy-scroll.css">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/element-ui"></script>
-    <script src="./happy-scroll.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="./happy-scroll.js"></script>
     <style>
       * {
         margin: 0;
@@ -43,11 +43,11 @@
       .text-box {
         display: inline-block;
       }
-      .text-box > p{
+      .text-box > li{
         font-size: 14px;
         line-height: 28px;
       }
-      .text-box > p:nth-child(odd){
+      .text-box > li:nth-child(odd){
         background-color: #eee
       }
     </style>
@@ -64,19 +64,22 @@
       </div>
       <div>当前Top: {{scrollTop}}</div>
       <div class="container">
-          <happy-scroll class="content"
+          <happy-scroll
             size="6"
+            :min-length-v="0.15"
             left
             :scroll-left.sync="scrollLeft"
             :scroll-top.sync="scrollTop"
-            bigger-move-h="end"
+            bigger-move-h="start"
             smaller-move-h="end"
+            @vertical-start="start"
+            @vertical-end="end"
             color="rgba(79, 192, 141, .7)"
             resize>
-            <div class="text-box">
-              <p>回答 - 北岛。诗中展现了悲愤之极的冷峻，以坚定的口吻表达了对暴力世界的怀疑。</p>
-              <p v-for="index in length">{{text[index % text.length]}}</p>
-            </div>
+            <ul class="text-box">
+              <li>回答 - 北岛。诗中展现了悲愤之极的冷峻，以坚定的口吻表达了对暴力世界的怀疑。</li>
+              <li v-for="index in length">{{text[index % text.length]}}</li>
+            </ul>
           </happy-scroll>
       </div>
     </div>
@@ -85,6 +88,7 @@
         el: '#app',
         data: function () {
           return {
+            hideHorizontal: true,
             length: 12,
             scrollTop: 0,
             scrollLeft: 0,
@@ -119,6 +123,14 @@
               '那是未来人们凝视的眼睛。',
               '🗣'
             ]
+          }
+        },
+        methods: {
+          start (offset) {
+            this.$message.success('到头部了')
+          },
+          end (offset) {
+            this.$message.success('到尾部了')
           }
         }
       })

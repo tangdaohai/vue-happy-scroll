@@ -7,7 +7,7 @@
 
     <div ref="strip"
       class="happy-scroll-bar"
-      :style="[translate, initStrip, initSize, {background: color}]"
+      :style="[translate, {[config.sizeAttr]: length + 'px'}, initSize, {background: color}, {opacity: isOpacity}]"
       @mousedown.stop="handlerMouseDown">
     </div>
   </div>
@@ -23,10 +23,6 @@ export default {
     left: Boolean,
     // 使横向滚动条居右
     top: Boolean,
-    percentage: {
-      type: Number,
-      required: true
-    },
     move: {
       type: Number,
       default: 0
@@ -35,6 +31,16 @@ export default {
     size: {
       type: [Number, String],
       default: 4
+    },
+    // 竖向的 滚动条的最小长度，当滚动条长度随元素比例缩小到一定程度时不再缩小。
+    minLengthV: {
+      type: Number,
+      default: 40
+    },
+    // 横向的 滚动条的最小长度，当滚动条长度随元素比例缩小到一定程度时不再缩小。
+    minLengthH: {
+      type: Number,
+      default: 40
     },
     // 滚动条的背景色
     color: {
@@ -56,32 +62,36 @@ export default {
       binded: false,
       // 滚动条的宽或者高
       length: 0,
+      // 滚动条空白区域 与 (用户内容元素的高度 - 视图区域的高度) 的比例
+      percentage: 0,
+      // 滚动条最大的偏移量。这个值等于滚动条容器 减去 滚动条 的空白区域
+      maxOffset: 0,
+      // 记录当前的偏移量，用于触发 滚动到头部和尾部的事件
+      currentOffset: 0,
       // 鼠标移动的节流函数
       moveThrottle: generateThrottle(this.throttle)
     }
   },
+  watch: {
+    currentOffset (newVal) {
+      if (newVal === 0) {
+        // 触发事件
+        this.emitLocationEvent('start', 0)
+      } else if (newVal === this.maxOffset) {
+        this.emitLocationEvent('end', newVal / this.percentage)
+      }
+    }
+  },
   computed: {
-    // 初始化宽度(横向时为高度)
+    // 初始化滚动条的大小 (横向时为高度，竖向时为宽度)
     initSize () {
       return {
         [this.horizontal ? 'height' : 'width']: this.size + 'px'
       }
     },
-    /**
-     * 初始化滚动条的长度, 这个方法会被执行两次。
-     */
-    initStrip () {
-      const container = this.$refs.stripContainer // 滚动条的容器
-
-      if (!this.percentage && !container) {
-        return
-      }
-      // 滚动条的高度或宽度 = 滚动条容器(100%高) * 百分比(外层内容与容器的比例)
-      const number = this.length = container[this.config.client] * this.percentage
-      // 根据 水平还是垂直方向 决定初始化滚动条的 宽还是高
-      return {
-        [this.config.sizeAttr]: `${number}px`
-      }
+    // 当 percentage 大于等于 1 时，说明不需要显示滚动条
+    isOpacity () {
+      return this.percentage < 1 ? 1 : 0
     },
     /**
      * 变化滚动条的位置，scroll主体内容，滚动时，滚动条跟着联动
@@ -91,14 +101,13 @@ export default {
 
       if (!this.$refs.stripContainer) return
 
-      const rect = this.$refs.stripContainer.getBoundingClientRect()
-      const maxOffset = rect[this.config.sizeAttr] - this.length
       if (offset < 0) {
         offset = 0
       }
-      if (offset > maxOffset) {
-        offset = maxOffset
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset
       }
+      this.currentOffset = offset
       return {
         transform: `${this.config.translate}(${offset}px)`
       }
@@ -112,6 +121,44 @@ export default {
     }
   },
   methods: {
+    // 触发滚动条滚动到顶部或底部的事件
+    emitLocationEvent (type, outsideOffset) {
+      const direction = this.horizontal ? 'horizontal' : 'vertical'
+      this.$emit(`${direction}-${type}`, outsideOffset)
+    },
+    /**
+     * scrollSize 如果是竖向滚动条，则为 用户内容元素的 scrollHeight, 横向的则作为 用户内容元素的 scrollWidth
+     * clientSize 可视区域的 clientHeight clientWidth. 横竖的原理同scrollSize
+     */
+    computeStrip (scrollSize, clientSize) {
+      // const container = this.$refs.stripContainer // 滚动条的容器
+      const currentSize = this.$refs.stripContainer[this.config.client]
+      /**
+       * 滚动条长度。
+       *
+       * clientSize / scrollSize 是表示视图范围与用户内容元素的比例
+       * 用此比例来决定 滚动条的长度 滚动条容器 * 比例 = 滚动条长度
+       * 但是当用户内容元素无限大的时候，可能会导致滚动条无限小，所以会设置最小长度
+       */
+      this.length = currentSize * (clientSize / scrollSize)
+      let minLength = this.horizontal ? this.minLengthH : this.minLengthV
+      if (minLength < 1) {
+        // 按百分比处理
+        minLength = currentSize * minLength
+      }
+      // 判断是否滚动条长度是否已经小于了设置的最小长度
+      this.length = this.length < minLength ? minLength : this.length
+      // 滚动条容器 - 滚动条长度 = 剩余的空间
+      const space = this.maxOffset = currentSize - this.length
+      /**
+       * 这里计算一个比例
+       * 已高度举例子:
+       * 使用 剩余空间 除以 (用户内容元素的高度 - 视图区域的高度)
+       * 可以把 视图区域的高度 比作 滚动条的长度 用户内容元素的高度 比作 滚动条容器的高度
+       * 所以使用两者剩余空间的比例，来计算 当滚动条滑动1px的时候 用户内容元素应该滑动多少 px，当用户内容元素移动时 来计算 滚动条应该移动多少px
+       */
+      this.percentage = space / (scrollSize - clientSize)
+    },
     bindEvents () {
       // 已绑定过了 不再重复绑定
       if (this.binded) return
@@ -179,29 +226,26 @@ export default {
       this.changeOffset(offset, event)
     },
     changeOffset (offset, event) {
-      const rect = this.$refs.stripContainer.getBoundingClientRect()
-      const maxOffset = rect[this.config.sizeAttr] - this.length
-
       // 防止滚动条越界
       if (offset < 0) {
         offset = 0
       }
 
       // 防止滚动条越界
-      if (offset > maxOffset) {
-        offset = maxOffset
+      if (offset > this.maxOffset) {
+        offset = this.maxOffset
       }
 
-      if (event && offset > 0 && offset < maxOffset) {
+      if (event && offset > 0 && offset < this.maxOffset) {
         event.preventDefault()
         event.stopImmediatePropagation()
       }
-
+      this.currentOffset = offset
       // 偏移
       this.$refs.strip.style.transform = `${this.config.translate}(${offset}px)`
 
       // 告诉scroll.vue 滚动条移动的偏移量
-      this.$emit('input', offset)
+      this.$emit('change', offset / this.percentage)
     }
   },
   created () {

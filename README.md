@@ -162,15 +162,71 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
 
 * 用法:
 
-```html
-  <happy-scroll size="8">
-    <!-- 你的内容 -->
-  </happy-scroll>
+  ```html
+    <happy-scroll size="8">
+      <!-- 你的内容 -->
+    </happy-scroll>
   ```
 
   设置滚动条的大小。
 
   > 对于竖向滚动条表示宽度，竖向滚动条表示高度
+
+### min-length-h (*new)
+
+* 类型`NUmber`
+
+* 默认值`40`
+
+* 单位`px`
+
+* 用法
+
+  ```html
+  <happy-scroll :min-length-h="20">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  设置` 横向`滚动条最小的长度，**当元素无限长或者宽的时候，会导致滚动条无限小**，这种情况可以使用该属性。来设置最小的长度。
+
+  ```html
+  <happy-scroll :min-length-h="0.2">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  也可以设置`百分比`来限制最小长度(可视区域 * min-length-h)。假设可视区域的宽度为`300px`，那么滚动条为`60px`。
+
+  当`min-length-h`小于`1`的时候，会将其当作`百分比`来处理。
+
+### min-length-v (*new)
+
+* 类型`NUmber`
+
+* 默认值`40`
+
+* 单位`px`
+
+* 用法
+
+  ```html
+  <happy-scroll :min-length-v="20">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  设置` 竖向`滚动条最小的长度，**当元素无限长或者宽的时候，会导致滚动条无限小**，这种情况可以使用该属性。来设置最小的长度。
+
+  ```html
+  <happy-scroll :min-length-v="0.2">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+  也可以设置`百分比`来限制最小长度(可视区域 * min-length-v)。假设可视区域的高度为`200px`，那么滚动条为`40px`。
+
+  当`min-length-h`小于`1`的时候，会将其当作`百分比`来处理。
 
 ### scroll-top
 
@@ -251,6 +307,8 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
   ```
 
   隐藏`横向`滚动条
+
+  >如果你不需要横向出现滚动条，可以设置hide-horizontal来提高性能。
 
 ### resize
 
@@ -371,6 +429,66 @@ https://github.com/happy-js/vue-happy-scroll/projects/1
 * 说明:
 
   设置鼠标拖动滚动条的节流时间，如果没有特殊的要求不建议修改此值。
+
+## 事件
+
+### horizontal-start
+
+* 参数`scrollLeft`
+
+  > 在`horizontal-start`事件下，`scrollLeft`始终为`0`。
+
+* 说明
+  监听横向滚动条滚动到`头部`的事件。当`scroll-left = 0`时会触发该事件。
+
+  ```html
+  <happy-scroll @horizontal-start="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+### horizontal-end
+
+* 参数`scrollLeft`
+
+* 说明
+  监听横向滚动条滚动到`尾部`的事件。
+
+  ```html
+  <happy-scroll @horizontal-end="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+
+### vertical-start
+
+* 参数`scrollTop`
+
+  > 在`vertical-start`事件下，`scrollTop`始终为`0`
+
+* 说明
+  监听竖向滚动条滚动到`头部`的事件。当`scroll-top = 0`时会触发该事件。
+
+  ```html
+  <happy-scroll @vertical-start="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
+### vertical-start
+
+* 参数`scrollTop`
+
+* 说明
+  监听竖向滚动条滚动到`尾部`的事件。
+
+  ```html
+  <happy-scroll @vertical-end="yourHandler">
+    <!-- 你的内容 -->
+  </happy-scroll>
+  ```
+
 
 ## PR
 期待并欢迎您的PR。
