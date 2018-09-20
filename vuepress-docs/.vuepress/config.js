@@ -1,8 +1,9 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   title: 'vue-happy-scroll',
   description: '基于 vue@2.0 使用的简单、多功能的滚动条组件',
+  dest: './docs-demo',
   serviceWorker: true,
-  head: [],
   markdown: {
     lineNumbers: true
   },
@@ -33,5 +34,11 @@ module.exports = {
       ]
     },
     displayAllHeaders: true
-  }
+  },
+  // configureWebpack: (config, isServer) => {
+  //   if (!isServer) {
+  //     // 修改客户端的 webpack 配置
+  //       // rules
+  //   }
+  // }
 }

@@ -11,7 +11,8 @@
     "release": "npm run build && npm run min",
     "watch": "./node_modules/.bin/rollup --config --watch",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "docs:dev": "./node_modules/.bin/vuepress dev vuepress-docs"
+    "docs:dev": "./node_modules/.bin/vuepress dev vuepress-docs",
+    "docs:build": "vuepress build vuepress-docs"
   },
   "repository": {
     "type": "git",
@@ -62,6 +63,7 @@
     "rollup-plugin-vue": "^2.4.1",
     "standard": "^10.0.3",
     "uglify-es": "^3.0.28",
+    "vue-material": "^1.0.0-beta-10.2",
     "vuepress": "^0.14.4"
   },
   "browserslist": [
