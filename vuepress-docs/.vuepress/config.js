@@ -1,4 +1,7 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const CopyWebpackPlugin = require('copy-webpack-plugin')
+const path = require('path')
+console.log(path.resolve(__dirname, '../../node_modules'))
+console.log('----------------')
 module.exports = {
   title: 'vue-happy-scroll',
   description: '基于 vue@2.0 使用的简单、多功能的滚动条组件',
@@ -6,6 +9,9 @@ module.exports = {
   serviceWorker: true,
   markdown: {
     lineNumbers: true
+  },
+  scss: {
+    includePaths: ['./node_modules']
   },
   themeConfig: {
     lastUpdated: 'Last Updated',

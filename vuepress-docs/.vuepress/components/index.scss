@@ -1,0 +1,7 @@
+$mdc-theme-primary: #448aff;
+
+@import "@material/button/mdc-button";
+.h-button {
+  @include mdc-button-shape-radius(0);
+  @extend .mdc-button;
+}
