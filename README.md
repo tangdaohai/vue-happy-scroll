@@ -170,11 +170,11 @@ https://github.com/tangdaohai/vue-happy-scroll/projects/1
 
   设置滚动条的大小。
 
-  > 对于竖向滚动条表示宽度，竖向滚动条表示高度
+  > 对于竖向滚动条表示宽度，横向滚动条表示高度
 
 ### min-length-h (*new)
 
-* 类型`NUmber`
+* 类型`Number`
 
 * 默认值`40`
 
