@@ -156,10 +156,6 @@ export default {
       this.$refs.container.scrollLeft = newVal
       this.$emit('update:scrollLeft', this.$refs.container.scrollLeft)
     },
-    updateSyncScroll: debounce(function () {
-      this.$emit('update:scrollTop', this.moveY)
-      this.$emit('update:scrollLeft', this.moveX)
-    }, 50),
     // 监听dom元素的滚动事件，通知strip，将bar移动到对应位置
     onScroll (e) {
       // 节流
@@ -318,6 +314,13 @@ export default {
      * false. 系统滚动条始终存在，所以会占用宽度 (占用视图宽度的模式，windows下默认为此方式)
      */
     this.isScrollNotUseSpace = happyJS._isScrollNotUseSpace
+  },
+  created () {
+    // @FIXME 更新滚动事件，因为需要使用 this.throttle 变量，所以声明在 created 中
+    this.updateSyncScroll = debounce(function () {
+      this.$emit('update:scrollTop', this.moveY)
+      this.$emit('update:scrollLeft', this.moveX)
+    }, this.throttle)
   },
   mounted () {
     // 计算最外层宽高，设置滚动条元素的宽高

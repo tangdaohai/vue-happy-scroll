@@ -1,6 +1,6 @@
 /*!
     name: vue-happy-scroll
-    version: 2.1.0
+    version: 2.1.1
     author: tangdaohai@outlook.com
     github: https://github.com/tangdaohai/vue-happy-scroll#readme
   */
@@ -110,9 +110,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var HappyScrollStrip = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "stripContainer", staticClass: "happy-scroll-strip", class: [_vm.horizontal ? 'happy-scroll-strip--horizontal' : 'happy-scroll-strip--vertical'], style: [_vm.initLocation], on: { "!wheel": function wheel($event) {
-          $event.stopPropagation();_vm.handlerWheel($event);
+          $event.stopPropagation();return _vm.handlerWheel($event);
         } } }, [_c('div', { ref: "strip", staticClass: "happy-scroll-bar", style: [_vm.translate, _defineProperty({}, _vm.config.sizeAttr, _vm.length + 'px'), _vm.initSize, { background: _vm.color }, { opacity: _vm.isOpacity }], on: { "mousedown": function mousedown($event) {
-          $event.stopPropagation();_vm.handlerMouseDown($event);
+          $event.stopPropagation();return _vm.handlerMouseDown($event);
         } } })]);
   }, staticRenderFns: [],
   name: 'happy-scroll-strip',
@@ -2038,7 +2038,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 var HappyScroll = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { ref: "happy-scroll", staticClass: "happy-scroll" }, [_c('div', { ref: "container", staticClass: "happy-scroll-container", style: [_vm.initSize], on: { "scroll": function scroll($event) {
-          $event.stopPropagation();_vm.onScroll($event);
+          $event.stopPropagation();return _vm.onScroll($event);
         } } }, [_c('div', { ref: "content", staticClass: "happy-scroll-content", style: [_vm.contentBorderStyle] }, [_vm._t("default")], 2)]), !_vm.hideVertical ? _c('happy-scroll-strip', _vm._g(_vm._b({ ref: "stripY", attrs: { "throttle": _vm.throttle, "move": _vm.moveY }, on: { "change": _vm.slideYChange } }, 'happy-scroll-strip', _vm.$attrs, false), _vm.$listeners)) : _vm._e(), !_vm.hideHorizontal ? _c('happy-scroll-strip', _vm._g(_vm._b({ ref: "stripX", attrs: { "horizontal": "", "throttle": _vm.throttle, "move": _vm.moveX }, on: { "change": _vm.slideXChange } }, 'happy-scroll-strip', _vm.$attrs, false), _vm.$listeners)) : _vm._e()], 1);
   }, staticRenderFns: [],
   name: 'happy-scroll',
@@ -2153,10 +2153,6 @@ var HappyScroll = { render: function render() {
       this.$emit('update:scrollLeft', this.$refs.container.scrollLeft);
     },
 
-    updateSyncScroll: debounce(function () {
-      this.$emit('update:scrollTop', this.moveY);
-      this.$emit('update:scrollLeft', this.moveX);
-    }, 50),
     // 监听dom元素的滚动事件，通知strip，将bar移动到对应位置
     onScroll: function onScroll(e) {
       // 节流
@@ -2324,6 +2320,13 @@ var HappyScroll = { render: function render() {
      */
     this.isScrollNotUseSpace = happyJS._isScrollNotUseSpace;
   },
+  created: function created() {
+    // @FIXME 更新滚动事件，因为需要使用 this.throttle 变量，所以声明在 created 中
+    this.updateSyncScroll = debounce(function () {
+      this.$emit('update:scrollTop', this.moveY);
+      this.$emit('update:scrollLeft', this.moveX);
+    }, this.throttle);
+  },
   mounted: function mounted() {
     var _this2 = this;
 
@@ -2355,7 +2358,7 @@ var HappyScroll = { render: function render() {
   }
 };
 
-var version = "2.1.0";
+var version = "2.1.1";
 
 // 如果vue是全局变量,使用自动全局安装。
 if (typeof window !== 'undefined' && window.Vue) {
