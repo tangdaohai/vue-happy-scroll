@@ -90,6 +90,11 @@ export default {
     biggerMoveV: {
       type: String,
       default: ''
+    },
+    // 是否开启监控浏览器宽高
+    resizeBrowser: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -303,6 +308,33 @@ export default {
         // eslint-disable-next-line
         this.isScrollNotUseSpace = Vue._happyJS._isScrollNotUseSpace
       }
+    },
+    // 监听浏览器宽高
+    watchBrowser: debounce(function () {
+      window.onresize = () => {
+        return (() => {
+          this.initScroll()
+        })()
+      }
+    }, 500, true),
+    // 初始化加载
+    initScroll () {
+      this.setContainerSize()
+      this.$nextTick(() => {
+        // 使滚动条进行计算比例
+        this.computeStripX()
+        this.computeStripY()
+        // 判断当前浏览器滚动条的模式，依据slot元素高度，如果高度大于视图高度，则出现滚动条了，此时再判断滚动条的模式
+        this.checkScrollMode()
+        // 获取当前浏览器滚动条的宽高
+        this.initBrowserSize()
+        this.$nextTick(() => {
+          // 因为 initBrowserSize 会有增加 20px border 的操作，所以需要等待这20px渲染完成后再进行操作
+          // 将视图dom移动到设定的位置
+          this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
+          this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
+        })
+      })
     }
   },
   beforeCreate () {
@@ -323,24 +355,12 @@ export default {
     }, this.throttle)
   },
   mounted () {
-    // 计算最外层宽高，设置滚动条元素的宽高
-    this.setContainerSize()
-    this.$nextTick(() => {
-      // 使滚动条进行计算比例
-      this.computeStripX()
-      this.computeStripY()
-      // 判断当前浏览器滚动条的模式，依据slot元素高度，如果高度大于视图高度，则出现滚动条了，此时再判断滚动条的模式
-      this.checkScrollMode()
-      // 获取当前浏览器滚动条的宽高
-      this.initBrowserSize()
-
-      this.$nextTick(() => {
-        // 因为 initBrowserSize 会有增加 20px border 的操作，所以需要等待这20px渲染完成后再进行操作
-        // 将视图dom移动到设定的位置
-        this.scrollTop && (this.$refs.container.scrollTop = +this.scrollTop)
-        this.scrollLeft && (this.$refs.container.scrollLeft = +this.scrollLeft)
-      })
-    })
+    
+    // 是否开启监听浏览器宽高
+    if (this.resizeBrowser) {
+      this.watchBrowser()
+    }
+    this.initScroll()
 
     // 监听slot视图变化, 方法内部会判断是否设置了开启监听resize
     this.resizeListener()
