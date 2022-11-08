@@ -59,7 +59,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-uglify": "^2.0.1",
-    "rollup-plugin-vue": "^2.4.1",
+    "rollup-plugin-vue": "^6.0.0",
     "standard": "^10.0.3",
     "uglify-es": "^3.0.28"
   },
