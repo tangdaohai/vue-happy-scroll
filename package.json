@@ -38,7 +38,7 @@
     "babel-eslint": "^8.0.1",
     "babel-preset-env": "^1.6.1",
     "chalk": "^2.4.1",
-    "commitizen": "^2.10.1",
+    "commitizen": "^4.3.0",
     "conventional-changelog-cli": "^2.0.5",
     "cross-env": "^5.1.1",
     "cz-conventional-changelog": "^2.1.0",
